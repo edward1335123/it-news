@@ -5,6 +5,8 @@ const TIME_ZONE = 'Asia/Tokyo';
 const MINUTE = 60 * 1000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
+/** 時計のずれとして許容する幅 */
+const CLOCK_SKEW = 5 * MINUTE;
 
 type TokyoParts = {
   year: number;
@@ -27,8 +29,9 @@ const partsFormatter = new Intl.DateTimeFormat('ja-JP', {
 });
 
 function tokyoParts(date: Date): TokyoParts {
+  const parts = partsFormatter.formatToParts(date);
   const get = (type: Intl.DateTimeFormatPartTypes): string =>
-    partsFormatter.formatToParts(date).find((p) => p.type === type)?.value ?? '';
+    parts.find((p) => p.type === type)?.value ?? '';
   return {
     year: Number(get('year')),
     month: Number(get('month')),
@@ -48,12 +51,13 @@ export function formatDateTime(iso: string): string {
 /**
  * 公開日時を相対表示する（たった今 / N分前 / N時間前 / N日前）。
  * 7日以上前と未来の日時は日付で表示する。
+ * 収集側と端末の時計のずれを見込み、5分先までの日時は「たった今」とする。
  */
 export function formatRelativeTime(iso: string, now: Date): string {
   const date = new Date(iso);
   const diff = now.getTime() - date.getTime();
+  if (diff >= -CLOCK_SKEW && diff < MINUTE) return 'たった今';
   if (diff >= 0) {
-    if (diff < MINUTE) return 'たった今';
     if (diff < HOUR) return `${Math.floor(diff / MINUTE)}分前`;
     if (diff < DAY) return `${Math.floor(diff / HOUR)}時間前`;
     if (diff < 7 * DAY) return `${Math.floor(diff / DAY)}日前`;

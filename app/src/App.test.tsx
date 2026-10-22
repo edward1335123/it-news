@@ -6,6 +6,7 @@ import eventsJson from '../public/data/events.json';
 import newsJson from '../public/data/news.json';
 import sourcesJson from '../public/data/sources.json';
 import { App } from './App';
+import { INVALID_DATA_MESSAGE } from './lib/useRemoteData';
 
 const MOCK_FILES: Record<string, unknown> = {
   '/data/news.json': newsJson,
@@ -150,15 +151,56 @@ describe('App', () => {
     expect(fetchMock).toHaveBeenCalledWith('/data/news.json', expect.anything());
   });
 
-  it('スキーマに合わないデータはエラーとして表示する', async () => {
+  it('スキーマに合わないデータはエラーとして表示し、検証の詳細は画面に出さない', async () => {
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     MOCK_FILES['/data/events.json'] = { generatedAt: 'invalid', events: [] };
     try {
       const user = userEvent.setup();
       render(<App />);
       await user.click(screen.getByRole('tab', { name: 'イベント' }));
-      expect(await screen.findByRole('alert')).toHaveTextContent('イベントを読み込めませんでした');
+      const alert = await screen.findByRole('alert');
+      expect(alert).toHaveTextContent('イベントを読み込めませんでした');
+      expect(alert).toHaveTextContent(INVALID_DATA_MESSAGE);
+      expect(alert).not.toHaveTextContent('generatedAt');
+      expect(consoleError).toHaveBeenCalled();
     } finally {
       MOCK_FILES['/data/events.json'] = eventsJson;
+      consoleError.mockRestore();
+    }
+  });
+
+  it('記事・イベントが0件なら空の状態を表示する', async () => {
+    MOCK_FILES['/data/news.json'] = { generatedAt: '2026-10-22T12:00:00+09:00', articles: [] };
+    MOCK_FILES['/data/events.json'] = { generatedAt: '2026-10-22T12:00:00+09:00', events: [] };
+    try {
+      const user = userEvent.setup();
+      render(<App />);
+      expect(await screen.findByText('記事はありません')).toBeInTheDocument();
+      expect(screen.queryByText('別のサブカテゴリを選んでください')).not.toBeInTheDocument();
+      await user.click(screen.getByRole('tab', { name: 'イベント' }));
+      expect(await screen.findByText('予定されているイベントはありません')).toBeInTheDocument();
+    } finally {
+      MOCK_FILES['/data/news.json'] = newsJson;
+      MOCK_FILES['/data/events.json'] = eventsJson;
+    }
+  });
+
+  it('絞り込みの結果が0件なら別のサブカテゴリを促す', async () => {
+    const devArticle = articles.find((a) => a.tags.length === 1 && a.tags[0] === 'ai-dev');
+    expect(devArticle).toBeDefined();
+    MOCK_FILES['/data/news.json'] = {
+      generatedAt: '2026-10-22T12:00:00+09:00',
+      articles: [devArticle],
+    };
+    try {
+      const user = userEvent.setup();
+      render(<App />);
+      await screen.findAllByRole('article');
+      await user.click(screen.getByRole('button', { name: TAGS['ai-model'].label }));
+      expect(screen.getByText('記事はありません')).toBeInTheDocument();
+      expect(screen.getByText('別のサブカテゴリを選んでください')).toBeInTheDocument();
+    } finally {
+      MOCK_FILES['/data/news.json'] = newsJson;
     }
   });
 });

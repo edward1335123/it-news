@@ -3,6 +3,8 @@ import { useCallback, useEffect, useState } from 'react';
 export type LoadState<T> =
   { status: 'loading' } | { status: 'error'; message: string } | { status: 'success'; data: T };
 
+export const INVALID_DATA_MESSAGE = 'データの形式が正しくありません';
+
 /** `app/public/data/` 以下のファイルの URL */
 export function dataUrl(fileName: string): string {
   return `${import.meta.env.BASE_URL}data/${fileName}`;
@@ -30,7 +32,15 @@ export function useRemoteData<T>(
   useEffect(() => {
     const controller = new AbortController();
     fetchJson(url, controller.signal)
-      .then(parse)
+      .then((json) => {
+        try {
+          return parse(json);
+        } catch (error) {
+          // 検証エラーの詳細は長いので画面には出さず、コンソールに残す
+          console.error(error);
+          throw new Error(INVALID_DATA_MESSAGE, { cause: error });
+        }
+      })
       .then(
         (data) => {
           if (!controller.signal.aborted) setState({ status: 'success', data });

@@ -118,7 +118,8 @@ a {
   cursor: pointer;
 }
 
-.header .icon-button:first-child {
+/* 戻るボタンだけを左に寄せる（検索ボタンには当てない） */
+.header > .icon-button:first-child {
   margin-left: calc(-1 * var(--space-3));
 }
 
