@@ -16,6 +16,7 @@
     "build": "npm run build -w app",
     "preview": "npm run preview -w app",
     "collect:news": "npm run collect:news -w collector",
+    "collect:events": "npm run collect:events -w collector",
     "lint": "eslint . --max-warnings 0 && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "tsc -p tsconfig.json && npm run typecheck --workspaces",

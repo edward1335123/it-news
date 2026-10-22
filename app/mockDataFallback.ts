@@ -4,7 +4,7 @@ import type { Plugin } from 'vite';
 
 /**
  * 開発サーバー（`npm run dev`）で、まだ収集していない `data/*.json` の代わりに
- * `app/mock/` のモックを返す。`npm run collect:news` で実データを作ると、そちらを優先する。
+ * `app/mock/` のモックを返す。`npm run collect:news`・`collect:events` で実データを作ると、そちらを優先する。
  * ビルドには影響しない（本番でモックを配信しない）。
  */
 export function mockDataFallback(mockDir: string): Plugin {

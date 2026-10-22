@@ -46,7 +46,13 @@ npm run dev      # 開発サーバを起動（http://localhost:5173）
 | `app/public/data/events.json` | イベント（フェーズ6で収集に置き換えるまではモック） |
 | `app/mock/` | 開発・テスト用のモック（news.json・sources.json） |
 
-`npm run dev` では、`app/public/data/` にないファイル（収集前の news.json）の代わりに `app/mock/` のモックを返す。`npm run collect:news` を実行すると実データが表示される。収集は前回の news.json を読み込んで追記し、30日より古い記事を削除する。
+`npm run dev` では、`app/public/data/` にないファイル（収集前の news.json・events.json）の代わりに `app/mock/` のモックを返す。`npm run collect:news`・`npm run collect:events` を実行すると実データが表示される。収集は前回のファイルを読み込んで追記し、記事は30日、イベントは終了したものを削除する。
+
+connpass も取得するときは、API キーを環境変数に入れて実行する（キーはコミットしない）。
+
+```sh
+CONNPASS_API_KEY=xxxx npm run collect:events
+```
 
 ## アイコン
 

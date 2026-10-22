@@ -9,7 +9,7 @@ import {
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import eventsJson from '../public/data/events.json';
+import eventsJson from '../mock/events.json';
 import newsJson from '../mock/news.json';
 import sourcesJson from '../mock/sources.json';
 import { App } from './App';

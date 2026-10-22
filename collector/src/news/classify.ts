@@ -24,17 +24,18 @@ function compileKeyword(keyword: Keyword): RegExp {
     : new RegExp(escaped);
 }
 
-function compile(keywords: readonly Keyword[]): Matcher {
+/** キーワードのどれかを含むかを判定する関数を作る（文字列は `normalizeForMatch` したものを渡す） */
+export function compileKeywords(keywords: readonly Keyword[]): Matcher {
   const patterns = keywords.map(compileKeyword);
   return (text) => patterns.some((p) => p.test(text));
 }
 
-const isAiText = compile(AI_CORE);
-const isSecurityText = compile(SECURITY_CORE);
+export const isAiText = compileKeywords(AI_CORE);
+export const isSecurityText = compileKeywords(SECURITY_CORE);
 const TAG_MATCHERS = TAG_IDS.map((tag) => ({
   tag,
   requires: TAG_RULES[tag].requires,
-  matches: compile(TAG_RULES[tag].keywords),
+  matches: compileKeywords(TAG_RULES[tag].keywords),
 }));
 
 const AI_TAB_TAGS: readonly TagId[] = CATEGORY_TAGS.ai;

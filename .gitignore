@@ -10,4 +10,5 @@ coverage/
 
 # collector が生成する実データ（モックは app/mock/ にある）
 app/public/data/news.json
+app/public/data/events.json
 app/public/data/*.tmp

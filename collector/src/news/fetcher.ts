@@ -3,7 +3,10 @@ import type { RobotsRules } from './robots';
 
 export type HttpResponse = { status: number; contentType: string; body: string };
 /** URL を GET する。通信できなければ例外を投げる */
-export type HttpGet = (url: string) => Promise<HttpResponse>;
+export type HttpGet = (
+  url: string,
+  headers?: Readonly<Record<string, string>>,
+) => Promise<HttpResponse>;
 
 export type Sleep = (ms: number) => Promise<void>;
 

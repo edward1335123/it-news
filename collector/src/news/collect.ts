@@ -1,5 +1,7 @@
 import { SUMMARY_MAX_LENGTH, articleSchema } from '@itnews/shared';
 import type { Article, Source } from '@itnews/shared';
+import { errorMessage } from '../io';
+import type { Logger } from '../io';
 import { classify } from './classify';
 import { mergeArticles } from './dedupe';
 import { parseFeed } from './feed';
@@ -18,11 +20,7 @@ export const DEFAULT_MAX_ITEMS = 50;
 /** 情報源ごとに残す記事の上限（news.json が大きくなりすぎないように） */
 export const MAX_ARTICLES_PER_SOURCE = 100;
 
-export type Logger = {
-  info: (message: string) => void;
-  warn: (message: string) => void;
-  error: (message: string) => void;
-};
+export type { Logger };
 
 export type SourceOutcome =
   { source: Source; ok: true; items: FeedItem[] } | { source: Source; ok: false; error: string };
@@ -144,14 +142,6 @@ export function buildNews(input: {
     },
   };
   return capPerSource(merged).map((a) => ({ ...a, score: scoreArticle(a, context) }));
-}
-
-function errorMessage(error: unknown): string {
-  if (!(error instanceof Error)) return String(error);
-  // fetch の失敗は cause に原因（DNS・TLS など）が入る
-  return error.cause instanceof Error
-    ? `${error.message}（${error.cause.message}）`
-    : error.message;
 }
 
 /**

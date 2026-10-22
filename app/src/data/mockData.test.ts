@@ -13,11 +13,11 @@ import {
   sourcesFileSchema,
 } from '@itnews/shared';
 import { describe, expect, it } from 'vitest';
-import eventsJson from '../../public/data/events.json';
+import eventsJson from '../../mock/events.json';
 import newsJson from '../../mock/news.json';
 import sourcesJson from '../../mock/sources.json';
 
-/** モックJSON（app/mock/ の news.json・sources.json と、app/public/data/events.json）を検証する */
+/** モックJSON（app/mock/ の news.json・events.json・sources.json）を検証する */
 describe('モックデータ', () => {
   const { sources } = sourcesFileSchema.parse(sourcesJson);
   const { articles } = newsFileSchema.parse(newsJson);
