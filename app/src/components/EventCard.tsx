@@ -2,9 +2,16 @@ import { EVENT_FORMATS, EVENT_SOURCES, EVENT_TYPES } from '@itnews/shared';
 import type { TechEvent } from '@itnews/shared';
 import type { CSSProperties } from 'react';
 import { formatEventDate, formatParticipants } from '../lib/format';
+import { CalendarPlusIcon } from './icons';
 import { TagList } from './TagList';
 
-export function EventCard({ event }: { event: TechEvent }) {
+type Props = {
+  event: TechEvent;
+  /** .ics をダウンロードしてカレンダーに追加する */
+  onAddToCalendar: () => void;
+};
+
+export function EventCard({ event, onAddToCalendar }: Props) {
   const date = formatEventDate(event.startAt, event.endAt);
   const participants = formatParticipants(event.capacity, event.accepted);
   const place = event.format === 'online' ? 'オンライン' : event.venue;
@@ -61,8 +68,16 @@ export function EventCard({ event }: { event: TechEvent }) {
         </dl>
         <div className="card__footer">
           <TagList tags={event.tags} />
-          <span className="card__related">{EVENT_SOURCES[event.source].label}</span>
+          <span className="card__source-label">{EVENT_SOURCES[event.source].label}</span>
         </div>
+        <button
+          type="button"
+          className="button button--secondary card__action"
+          onClick={onAddToCalendar}
+        >
+          <CalendarPlusIcon />
+          カレンダーに追加
+        </button>
       </div>
     </article>
   );

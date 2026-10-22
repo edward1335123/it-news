@@ -1,5 +1,8 @@
 import type { Article } from '@itnews/shared';
 import { formatDateTime, formatRelativeTime } from '../lib/format';
+import { SAVED_LIST_LABELS } from '../lib/userState';
+import type { SavedList } from '../lib/userState';
+import { ClockIcon, StarIcon } from './icons';
 import { TagList } from './TagList';
 
 /** この値以上の注目度を強調して表示する */
@@ -10,18 +13,32 @@ type Props = {
   /** 情報源の表示名。不明なら ID を出す */
   sourceName: string;
   now: Date;
+  read: boolean;
+  saved: Record<SavedList, boolean>;
+  /** 記事を開いたとき（既読にする） */
+  onOpen: () => void;
+  onToggleSaved: (list: SavedList) => void;
 };
 
-export function ArticleCard({ article, sourceName, now }: Props) {
+export function ArticleCard({
+  article,
+  sourceName,
+  now,
+  read,
+  saved,
+  onOpen,
+  onToggleSaved,
+}: Props) {
   const relatedCount = article.related.length;
   const hot = article.score >= HOT_SCORE;
   return (
-    <article className="card">
+    <article className={read ? 'card card--read' : 'card'}>
       <div className="card__meta">
         <span className="card__source">{sourceName}</span>
         <time dateTime={article.publishedAt} title={formatDateTime(article.publishedAt)}>
           {formatRelativeTime(article.publishedAt, now)}
         </time>
+        {read && <span className="card__read">既読</span>}
         <span
           className={hot ? 'score score--hot' : 'score'}
           aria-label={`注目度 ${article.score}${hot ? '（注目）' : ''}`}
@@ -38,6 +55,8 @@ export function ArticleCard({ article, sourceName, now }: Props) {
           target="_blank"
           rel="noopener noreferrer"
           lang={article.lang}
+          onClick={onOpen}
+          onAuxClick={onOpen}
         >
           {article.title}
         </a>
@@ -45,6 +64,26 @@ export function ArticleCard({ article, sourceName, now }: Props) {
       <div className="card__footer">
         <TagList tags={article.tags} />
         {relatedCount > 0 && <span className="card__related">他{relatedCount}件の報道</span>}
+        <div className="card__actions">
+          <button
+            type="button"
+            className="icon-button toggle-button toggle-button--favorite"
+            aria-label={SAVED_LIST_LABELS.favorite}
+            aria-pressed={saved.favorite}
+            onClick={() => onToggleSaved('favorite')}
+          >
+            <StarIcon />
+          </button>
+          <button
+            type="button"
+            className="icon-button toggle-button"
+            aria-label={SAVED_LIST_LABELS.later}
+            aria-pressed={saved.later}
+            onClick={() => onToggleSaved('later')}
+          >
+            <ClockIcon />
+          </button>
+        </div>
       </div>
     </article>
   );

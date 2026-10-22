@@ -1,11 +1,13 @@
 import { CATEGORY_TAGS } from '@itnews/shared';
 import type { NewsFile, TagId } from '@itnews/shared';
-import { ArticleCard } from '../components/ArticleCard';
+import { ArticleList } from '../components/ArticleList';
 import { ChipBar } from '../components/ChipBar';
 import { EmptyView, ErrorView, LoadingView } from '../components/StatusView';
-import { articlesForTab } from '../lib/filter';
+import { Switch } from '../components/Switch';
+import { applyArticleFilter, articlesForTab } from '../lib/filter';
 import type { NewsTab } from '../lib/filter';
 import type { LoadState } from '../lib/useRemoteData';
+import type { UserState } from '../lib/userState';
 
 type Props = {
   tab: NewsTab;
@@ -15,6 +17,7 @@ type Props = {
   onSelectTag: (tag: TagId | null) => void;
   onRetry: () => void;
   now: Date;
+  user: UserState;
 };
 
 export function NewsView({
@@ -25,10 +28,19 @@ export function NewsView({
   onSelectTag,
   onRetry,
   now,
+  user,
 }: Props) {
   return (
     <>
       <ChipBar tags={CATEGORY_TAGS[tab]} selected={selectedTag} onSelect={onSelectTag} />
+      <div className="toolbar">
+        <Switch
+          checked={user.prefs.unreadOnly}
+          onChange={(unreadOnly) => user.updatePrefs((prev) => ({ ...prev, unreadOnly }))}
+        >
+          未読のみ
+        </Switch>
+      </div>
       <NewsList
         tab={tab}
         news={news}
@@ -36,6 +48,7 @@ export function NewsView({
         selectedTag={selectedTag}
         onRetry={onRetry}
         now={now}
+        user={user}
       />
     </>
   );
@@ -48,6 +61,7 @@ function NewsList({
   selectedTag,
   onRetry,
   now,
+  user,
 }: Omit<Props, 'onSelectTag'>) {
   if (news.status === 'loading') return <LoadingView label="記事を読み込み中" />;
   if (news.status === 'error') {
@@ -55,26 +69,20 @@ function NewsList({
       <ErrorView message="記事を読み込めませんでした" detail={news.message} onRetry={onRetry} />
     );
   }
-  const articles = articlesForTab(news.data.articles, tab, selectedTag);
+  const articles = applyArticleFilter(articlesForTab(news.data.articles, tab, selectedTag), {
+    ...user.prefs,
+    isRead: user.isRead,
+  });
   if (articles.length === 0) {
-    return (
-      <EmptyView
-        message="記事はありません"
-        hint={selectedTag === null ? undefined : '別のサブカテゴリを選んでください'}
-      />
-    );
+    return <EmptyView message="記事はありません" hint={emptyHint(selectedTag, user)} />;
   }
-  return (
-    <ul className="list">
-      {articles.map((article) => (
-        <li key={article.id}>
-          <ArticleCard
-            article={article}
-            sourceName={sourceNames.get(article.source) ?? article.source}
-            now={now}
-          />
-        </li>
-      ))}
-    </ul>
-  );
+  return <ArticleList articles={articles} sourceNames={sourceNames} now={now} user={user} />;
+}
+
+function emptyHint(selectedTag: TagId | null, user: UserState): string | undefined {
+  if (user.prefs.unreadOnly) {
+    return '未読の記事はありません。「未読のみ」を OFF にすると既読も表示します';
+  }
+  if (selectedTag !== null) return '別のサブカテゴリを選んでください';
+  return undefined;
 }

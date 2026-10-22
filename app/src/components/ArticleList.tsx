@@ -1,0 +1,35 @@
+import type { Article } from '@itnews/shared';
+import { isSaved } from '../lib/userState';
+import type { UserState } from '../lib/userState';
+import { ArticleCard } from './ArticleCard';
+
+type Props = {
+  articles: readonly Article[];
+  sourceNames: ReadonlyMap<string, string>;
+  now: Date;
+  user: UserState;
+};
+
+/** 既読・保存の状態を反映した記事カードの一覧 */
+export function ArticleList({ articles, sourceNames, now, user }: Props) {
+  return (
+    <ul className="list">
+      {articles.map((article) => (
+        <li key={article.id}>
+          <ArticleCard
+            article={article}
+            sourceName={sourceNames.get(article.source) ?? article.source}
+            now={now}
+            read={user.isRead(article.id)}
+            saved={{
+              favorite: isSaved(user.saved, 'favorite', article.id),
+              later: isSaved(user.saved, 'later', article.id),
+            }}
+            onOpen={() => user.markRead(article.id)}
+            onToggleSaved={(list) => user.toggleSaved(list, article)}
+          />
+        </li>
+      ))}
+    </ul>
+  );
+}

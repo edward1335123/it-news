@@ -26,9 +26,17 @@ const article: Article = {
 
 describe('ArticleCard', () => {
   const now = new Date('2026-10-22T12:00:00+09:00');
+  const defaults = {
+    sourceName: 'Zenn',
+    now,
+    read: false,
+    saved: { favorite: false, later: false },
+    onOpen: () => undefined,
+    onToggleSaved: () => undefined,
+  };
 
   it('タイトル・情報源・相対時刻・タグ・注目度・関連件数を表示する', () => {
-    render(<ArticleCard article={article} sourceName="Zenn" now={now} />);
+    render(<ArticleCard {...defaults} article={article} />);
     const link = screen.getByRole('link', { name: 'Claude Code の新機能' });
     expect(link).toHaveAttribute('href', 'https://example.com/a1');
     expect(link).toHaveAttribute('target', '_blank');
@@ -42,20 +50,56 @@ describe('ArticleCard', () => {
   });
 
   it('関連報道がなければ件数を出さず、注目度が低ければ強調しない', () => {
-    render(
-      <ArticleCard article={{ ...article, related: [], score: 20 }} sourceName="Zenn" now={now} />,
-    );
+    render(<ArticleCard {...defaults} article={{ ...article, related: [], score: 20 }} />);
     expect(screen.queryByText(/件の報道/)).not.toBeInTheDocument();
     expect(screen.getByLabelText('注目度 20')).toHaveTextContent('20');
   });
 
   it('タイトルの HTML をエスケープして表示する', () => {
     const title = '<img src=x onerror=alert(1)>';
-    const { container } = render(
-      <ArticleCard article={{ ...article, title }} sourceName="Zenn" now={now} />,
-    );
+    const { container } = render(<ArticleCard {...defaults} article={{ ...article, title }} />);
     expect(screen.getByRole('link', { name: title })).toBeInTheDocument();
     expect(container.querySelector('img')).toBeNull();
+  });
+
+  it('既読を示し、開くと onOpen、保存のボタンで onToggleSaved を呼ぶ', async () => {
+    const onOpen = vi.fn();
+    const onToggleSaved = vi.fn();
+    const { container } = render(
+      <ArticleCard
+        {...defaults}
+        article={article}
+        read
+        saved={{ favorite: true, later: false }}
+        onOpen={onOpen}
+        onToggleSaved={onToggleSaved}
+      />,
+    );
+    expect(container.querySelector('.card--read')).not.toBeNull();
+    expect(screen.getByText('既読')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'お気に入り' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: '後で読む' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+
+    const link = screen.getByRole('link', { name: 'Claude Code の新機能' });
+    // jsdom はページ遷移できないので、既定の動作を止めてからクリックする
+    link.addEventListener('click', (e) => e.preventDefault());
+    await userEvent.click(link);
+    expect(onOpen).toHaveBeenCalledOnce();
+
+    await userEvent.click(screen.getByRole('button', { name: 'お気に入り' }));
+    await userEvent.click(screen.getByRole('button', { name: '後で読む' }));
+    expect(onToggleSaved.mock.calls).toEqual([['favorite'], ['later']]);
+  });
+
+  it('未読なら既読の表示を出さない', () => {
+    render(<ArticleCard {...defaults} article={article} />);
+    expect(screen.queryByText('既読')).not.toBeInTheDocument();
   });
 });
 
@@ -77,7 +121,7 @@ describe('EventCard', () => {
   };
 
   it('日時・種別・形式・場所・主催・参加人数を表示する', () => {
-    render(<EventCard event={event} />);
+    render(<EventCard event={event} onAddToCalendar={() => undefined} />);
     expect(screen.getByRole('link', { name: 'AI エージェント勉強会' })).toHaveAttribute(
       'rel',
       'noopener noreferrer',
@@ -102,10 +146,17 @@ describe('EventCard', () => {
       startAt: '2026-10-28T19:00:00+09:00',
       tags: [],
     };
-    render(<EventCard event={online} />);
+    render(<EventCard event={online} onAddToCalendar={() => undefined} />);
     expect(screen.getAllByText('オンライン')).toHaveLength(2); // 形式のバッジと場所
     expect(screen.queryByText('主催')).not.toBeInTheDocument();
     expect(screen.queryByText('参加')).not.toBeInTheDocument();
+  });
+
+  it('「カレンダーに追加」で onAddToCalendar を呼ぶ', async () => {
+    const onAddToCalendar = vi.fn();
+    render(<EventCard event={event} onAddToCalendar={onAddToCalendar} />);
+    await userEvent.click(screen.getByRole('button', { name: 'カレンダーに追加' }));
+    expect(onAddToCalendar).toHaveBeenCalledOnce();
   });
 });
 
@@ -128,13 +179,38 @@ describe('ChipBar', () => {
 describe('TabBar', () => {
   it('4つのタブを表示し、選択中のタブを示す', async () => {
     const onChange = vi.fn();
-    render(<TabBar current="events" onChange={onChange} />);
+    render(<TabBar current="events" onChange={onChange} panelVisible />);
     const tabs = screen.getAllByRole('tab');
     expect(tabs.map((t) => t.textContent)).toEqual(['AI', 'セキュリティ', 'イベント', '保存']);
     expect(screen.getByRole('tab', { name: 'イベント' })).toHaveAttribute('aria-selected', 'true');
 
     await userEvent.click(screen.getByRole('tab', { name: '保存' }));
     expect(onChange).toHaveBeenCalledWith('saved');
+  });
+
+  it('選択中のタブだけがパネルを指し、Tab キーで止まる', () => {
+    const { rerender } = render(<TabBar current="ai" onChange={() => undefined} panelVisible />);
+    const ai = screen.getByRole('tab', { name: 'AI' });
+    const saved = screen.getByRole('tab', { name: '保存' });
+    expect(ai).toHaveAttribute('aria-controls', 'panel-ai');
+    expect(ai).toHaveAttribute('tabindex', '0');
+    expect(saved).not.toHaveAttribute('aria-controls');
+    expect(saved).toHaveAttribute('tabindex', '-1');
+
+    // 検索・設定を開いている間はパネルがないので指さない
+    rerender(<TabBar current="ai" onChange={() => undefined} panelVisible={false} />);
+    expect(ai).not.toHaveAttribute('aria-controls');
+  });
+
+  it('矢印キー・Home・End でタブを移る', async () => {
+    const onChange = vi.fn();
+    render(<TabBar current="ai" onChange={onChange} panelVisible />);
+    screen.getByRole('tab', { name: 'AI' }).focus();
+    await userEvent.keyboard('{ArrowRight}');
+    await userEvent.keyboard('{ArrowLeft}');
+    await userEvent.keyboard('{End}');
+    await userEvent.keyboard('{Home}');
+    expect(onChange.mock.calls).toEqual([['security'], ['saved'], ['saved'], ['ai']]);
   });
 });
 

@@ -1,8 +1,21 @@
 import type { Article, TagId, TechEvent } from '@itnews/shared';
 import { describe, expect, it } from 'vitest';
-import { articlesForTab, sortEvents } from './filter';
+import {
+  applyArticleFilter,
+  articlesForTab,
+  eventEndTime,
+  filterEvents,
+  normalizeText,
+  searchArticles,
+  sortEvents,
+} from './filter';
 
-function article(id: string, tags: TagId[], publishedAt: string): Article {
+function article(
+  id: string,
+  tags: TagId[],
+  publishedAt: string,
+  extra: Partial<Article> = {},
+): Article {
   return {
     id,
     title: id,
@@ -14,6 +27,21 @@ function article(id: string, tags: TagId[], publishedAt: string): Article {
     tags,
     score: 0,
     related: [],
+    ...extra,
+  };
+}
+
+function event(id: string, startAt: string, extra: Partial<TechEvent> = {}): TechEvent {
+  return {
+    id,
+    title: id,
+    url: `https://example.com/${id}`,
+    source: 'manual',
+    type: 'meetup',
+    format: 'online',
+    startAt,
+    tags: [],
+    ...extra,
   };
 }
 
@@ -49,16 +77,6 @@ describe('articlesForTab', () => {
 
 describe('sortEvents', () => {
   it('開催日が近い順に並べる（タイムゾーンが違っても時刻で比べる）', () => {
-    const event = (id: string, startAt: string): TechEvent => ({
-      id,
-      title: id,
-      url: `https://example.com/${id}`,
-      source: 'manual',
-      type: 'meetup',
-      format: 'online',
-      startAt,
-      tags: [],
-    });
     const events = [
       event('c', '2026-11-01T10:00:00+09:00'),
       event('a', '2026-10-31T23:00:00Z'), // 東京では 11/1 08:00
@@ -66,5 +84,139 @@ describe('sortEvents', () => {
     ];
     expect(sortEvents(events).map((e) => e.id)).toEqual(['a', 'b', 'c']);
     expect(events.map((e) => e.id)).toEqual(['c', 'a', 'b']);
+  });
+});
+
+describe('normalizeText', () => {
+  it('全角・半角と大文字・小文字の違いをなくす', () => {
+    expect(normalizeText('ＣＶＥ－２０２６ Ｃｌａｕｄｅ')).toBe('cve-2026 claude');
+    expect(normalizeText('ｶﾀｶﾅ')).toBe('カタカナ');
+  });
+});
+
+describe('searchArticles', () => {
+  const list = [
+    article('old', [], '2026-10-20T00:00:00Z', { title: 'Claude Code の新機能' }),
+    article('new', [], '2026-10-22T00:00:00Z', {
+      title: 'MCP サーバーの脆弱性',
+      summary: 'Claude Desktop に影響',
+    }),
+    article('other', [], '2026-10-21T00:00:00Z', { title: 'Gemini の料金改定' }),
+  ];
+
+  it('タイトルと抜粋から探し、新しい順に返す', () => {
+    expect(ids(searchArticles(list, 'claude'))).toEqual(['new', 'old']);
+  });
+
+  it('空白で区切った語をすべて含む記事だけを返す（全角の空白も区切りにする）', () => {
+    expect(ids(searchArticles(list, 'claude　脆弱性'))).toEqual(['new']);
+    expect(ids(searchArticles(list, 'claude gemini'))).toEqual([]);
+  });
+
+  it('全角や大文字で入力しても一致する', () => {
+    expect(ids(searchArticles(list, 'ＭＣＰ'))).toEqual(['new']);
+  });
+
+  it('語がなければ何も返さない', () => {
+    expect(searchArticles(list, '   ')).toEqual([]);
+  });
+});
+
+describe('applyArticleFilter', () => {
+  const list = [
+    article('a', [], '2026-10-22T00:00:00Z', { source: 'zenn', title: '【PR】おすすめツール' }),
+    article('b', [], '2026-10-22T00:00:00Z', { source: 'zenn', summary: 'エンジニア求人特集' }),
+    article('c', [], '2026-10-22T00:00:00Z', { source: 'publickey' }),
+    article('d', [], '2026-10-22T00:00:00Z', { source: 'qiita' }),
+  ];
+  const none = { mutedWords: [], disabledSources: [], unreadOnly: false, isRead: () => false };
+
+  it('条件がなければすべて返す', () => {
+    expect(ids(applyArticleFilter(list, none))).toEqual(['a', 'b', 'c', 'd']);
+  });
+
+  it('ミュート語をタイトルか抜粋に含む記事を隠す（表記ゆれも一致させ、空の語は無視する）', () => {
+    expect(ids(applyArticleFilter(list, { ...none, mutedWords: ['ｐｒ', '求人', ' '] }))).toEqual([
+      'c',
+      'd',
+    ]);
+  });
+
+  it('OFF にした情報源の記事を隠す', () => {
+    expect(ids(applyArticleFilter(list, { ...none, disabledSources: ['zenn', 'qiita'] }))).toEqual([
+      'c',
+    ]);
+  });
+
+  it('未読のみ表示なら既読を隠し、OFF なら既読も表示する', () => {
+    const isRead = (id: string) => id === 'a' || id === 'c';
+    expect(ids(applyArticleFilter(list, { ...none, unreadOnly: true, isRead }))).toEqual([
+      'b',
+      'd',
+    ]);
+    expect(ids(applyArticleFilter(list, { ...none, isRead }))).toEqual(['a', 'b', 'c', 'd']);
+  });
+});
+
+describe('eventEndTime', () => {
+  it('終了日時があればその時刻', () => {
+    const e = event('e', '2026-10-24T19:00:00+09:00', { endAt: '2026-10-24T21:00:00+09:00' });
+    expect(eventEndTime(e)).toBe(Date.parse('2026-10-24T21:00:00+09:00'));
+  });
+
+  it('終了日時がなければ開始日の終わり（東京の 24:00）', () => {
+    expect(eventEndTime(event('e', '2026-10-24T19:00:00+09:00'))).toBe(
+      Date.parse('2026-10-25T00:00:00+09:00'),
+    );
+    // UTC では前日でも、東京の日付で判定する
+    expect(eventEndTime(event('e', '2026-10-24T23:30:00Z'))).toBe(
+      Date.parse('2026-10-26T00:00:00+09:00'),
+    );
+    expect(eventEndTime(event('e', '2026-10-24T00:00:00+09:00'))).toBe(
+      Date.parse('2026-10-25T00:00:00+09:00'),
+    );
+  });
+});
+
+describe('filterEvents', () => {
+  const events = [
+    event('expo-offline', '2026-10-28T10:00:00+09:00', { type: 'expo', format: 'offline' }),
+    event('meetup-online', '2026-10-24T19:00:00+09:00', { type: 'meetup', format: 'online' }),
+    event('meetup-hybrid', '2026-10-26T19:00:00+09:00', { type: 'meetup', format: 'hybrid' }),
+    event('ended', '2026-10-20T19:00:00+09:00', {
+      endAt: '2026-10-20T21:00:00+09:00',
+      type: 'meetup',
+      format: 'online',
+    }),
+    event('ongoing', '2026-10-21T10:00:00+09:00', {
+      endAt: '2026-10-23T17:00:00+09:00',
+      type: 'expo',
+      format: 'offline',
+    }),
+  ];
+  const now = new Date('2026-10-22T12:00:00+09:00');
+  const all = { type: null, format: null };
+
+  it('終了したイベントを除き、開催中のものは残して近い順に並べる', () => {
+    expect(filterEvents(events, all, now).map((e) => e.id)).toEqual([
+      'ongoing',
+      'meetup-online',
+      'meetup-hybrid',
+      'expo-offline',
+    ]);
+  });
+
+  it('終了時刻ちょうどで表示しなくなる', () => {
+    const atEnd = new Date('2026-10-23T17:00:00+09:00');
+    expect(filterEvents(events, all, atEnd).map((e) => e.id)).not.toContain('ongoing');
+  });
+
+  it('種別・形式で絞り込み、両方を指定すると AND になる', () => {
+    const ids = (filter: Parameters<typeof filterEvents>[1]) =>
+      filterEvents(events, filter, now).map((e) => e.id);
+    expect(ids({ type: 'meetup', format: null })).toEqual(['meetup-online', 'meetup-hybrid']);
+    expect(ids({ type: null, format: 'offline' })).toEqual(['ongoing', 'expo-offline']);
+    expect(ids({ type: 'meetup', format: 'hybrid' })).toEqual(['meetup-hybrid']);
+    expect(ids({ type: 'conference', format: null })).toEqual([]);
   });
 });

@@ -2,14 +2,19 @@ import { eventsFileSchema, newsFileSchema, sourcesFileSchema } from '@itnews/sha
 import type { TagId } from '@itnews/shared';
 import { useMemo, useState } from 'react';
 import { Header } from './components/Header';
-import { EmptyView } from './components/StatusView';
 import { TabBar } from './components/TabBar';
 import { TABS, tabId, tabPanelId } from './tabs';
 import type { TabId } from './tabs';
-import type { NewsTab } from './lib/filter';
+import type { EventFilter, NewsTab } from './lib/filter';
+import { useNow } from './lib/useNow';
 import { dataUrl, useRemoteData } from './lib/useRemoteData';
+import { useUserState } from './lib/userState';
+import type { SavedList } from './lib/userState';
 import { EventsView } from './views/EventsView';
 import { NewsView } from './views/NewsView';
+import { SavedView } from './views/SavedView';
+import { SearchView } from './views/SearchView';
+import { SettingsView } from './views/SettingsView';
 
 const parseNews = (input: unknown) => newsFileSchema.parse(input);
 const parseEvents = (input: unknown) => eventsFileSchema.parse(input);
@@ -18,9 +23,9 @@ const parseSources = (input: unknown) => sourcesFileSchema.parse(input);
 /** ヘッダーから開く画面 */
 type Overlay = 'search' | 'settings';
 
-const OVERLAYS: Record<Overlay, { title: string; message: string }> = {
-  search: { title: '検索', message: 'キーワード検索は準備中です' },
-  settings: { title: '設定', message: '設定項目は準備中です' },
+const OVERLAY_TITLES: Record<Overlay, string> = {
+  search: '検索',
+  settings: '設定',
 };
 
 export function App() {
@@ -30,17 +35,24 @@ export function App() {
     ai: null,
     security: null,
   });
-  // 相対時刻の基準。読み込み時点で固定する
-  const [now] = useState(() => new Date());
+  const [eventFilter, setEventFilter] = useState<EventFilter>({ type: null, format: null });
+  const [savedList, setSavedList] = useState<SavedList>('favorite');
+  const [query, setQuery] = useState('');
+  const now = useNow();
+  const user = useUserState();
 
   const news = useRemoteData(dataUrl('news.json'), parseNews);
   const events = useRemoteData(dataUrl('events.json'), parseEvents);
   // 情報源の名前が取れなくても記事は表示する（ID で代用する）
-  const { state: sources } = useRemoteData(dataUrl('sources.json'), parseSources);
+  const sources = useRemoteData(dataUrl('sources.json'), parseSources);
   const sourceNames = useMemo(
     () =>
-      new Map(sources.status === 'success' ? sources.data.sources.map((s) => [s.id, s.name]) : []),
-    [sources],
+      new Map(
+        sources.state.status === 'success'
+          ? sources.state.data.sources.map((s) => [s.id, s.name])
+          : [],
+      ),
+    [sources.state],
   );
 
   const changeTab = (next: TabId) => {
@@ -57,35 +69,60 @@ export function App() {
           onSettings={() => setOverlay('settings')}
         />
       ) : (
-        <Header title={OVERLAYS[overlay].title} onBack={() => setOverlay(null)} />
+        <Header title={OVERLAY_TITLES[overlay]} onBack={() => setOverlay(null)} />
       )}
-      {overlay === null ? (
-        <main className="main" role="tabpanel" id={tabPanelId(tab)} aria-labelledby={tabId(tab)}>
-          {(tab === 'ai' || tab === 'security') && (
-            <NewsView
-              tab={tab}
-              news={news.state}
-              sourceNames={sourceNames}
-              selectedTag={selectedTags[tab]}
-              onSelectTag={(tag) => setSelectedTags((prev) => ({ ...prev, [tab]: tag }))}
-              onRetry={news.reload}
-              now={now}
-            />
-          )}
-          {tab === 'events' && <EventsView events={events.state} onRetry={events.reload} />}
-          {tab === 'saved' && (
-            <EmptyView
-              message="保存した記事はありません"
-              hint="お気に入り・後で読むに追加した記事がここに表示されます"
-            />
-          )}
-        </main>
-      ) : (
-        <main className="main">
-          <EmptyView message={OVERLAYS[overlay].message} />
-        </main>
-      )}
-      <TabBar current={tab} onChange={changeTab} />
+      <main className="main">
+        {overlay === null && (
+          <div role="tabpanel" id={tabPanelId(tab)} aria-labelledby={tabId(tab)}>
+            {(tab === 'ai' || tab === 'security') && (
+              <NewsView
+                tab={tab}
+                news={news.state}
+                sourceNames={sourceNames}
+                selectedTag={selectedTags[tab]}
+                onSelectTag={(tag) => setSelectedTags((prev) => ({ ...prev, [tab]: tag }))}
+                onRetry={news.reload}
+                now={now}
+                user={user}
+              />
+            )}
+            {tab === 'events' && (
+              <EventsView
+                events={events.state}
+                onRetry={events.reload}
+                filter={eventFilter}
+                onChangeFilter={setEventFilter}
+                now={now}
+              />
+            )}
+            {tab === 'saved' && (
+              <SavedView
+                list={savedList}
+                onChangeList={setSavedList}
+                news={news.state}
+                sourceNames={sourceNames}
+                now={now}
+                user={user}
+              />
+            )}
+          </div>
+        )}
+        {overlay === 'search' && (
+          <SearchView
+            query={query}
+            onChangeQuery={setQuery}
+            news={news.state}
+            onRetry={news.reload}
+            sourceNames={sourceNames}
+            now={now}
+            user={user}
+          />
+        )}
+        {overlay === 'settings' && (
+          <SettingsView sources={sources.state} onRetrySources={sources.reload} user={user} />
+        )}
+      </main>
+      <TabBar current={tab} onChange={changeTab} panelVisible={overlay === null} />
     </div>
   );
 }
