@@ -82,7 +82,8 @@ export const eventSchema = z
     message: 'endAt は startAt 以降にする',
     path: ['endAt'],
   });
-export type Event = z.infer<typeof eventSchema>;
+/** DOM の `Event` と区別するため TechEvent とする */
+export type TechEvent = z.infer<typeof eventSchema>;
 
 function uniqueIds<T extends { id: string }>(items: T[]): boolean {
   return new Set(items.map((item) => item.id)).size === items.length;

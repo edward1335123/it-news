@@ -5,8 +5,11 @@ import {
   EVENT_SOURCE_IDS,
   EVENT_TYPE_IDS,
   TAG_IDS,
+  articleSchema,
+  eventSchema,
   eventsFileSchema,
   newsFileSchema,
+  sourceSchema,
   sourcesFileSchema,
 } from '@itnews/shared';
 import { describe, expect, it } from 'vitest';
@@ -20,6 +23,22 @@ describe('モックデータ', () => {
   const { articles } = newsFileSchema.parse(newsJson);
   const { events } = eventsFileSchema.parse(eventsJson);
   const sourceById = new Map(sources.map((s) => [s.id, s]));
+
+  // アプリ用のスキーマは未知のキーを無視するので、キー名の打ち間違いはここで検出する
+  it('スキーマにないキーを含まない', () => {
+    for (const a of newsJson.articles) {
+      expect(articleSchema.strict().safeParse(a).error?.issues, a.id).toBeUndefined();
+      for (const r of a.related) {
+        expect(Object.keys(r).sort(), a.id).toEqual(['source', 'url']);
+      }
+    }
+    for (const e of eventsJson.events) {
+      expect(eventSchema.strict().safeParse(e).error?.issues, e.id).toBeUndefined();
+    }
+    for (const s of sourcesJson.sources) {
+      expect(sourceSchema.strict().safeParse(s).error?.issues, s.id).toBeUndefined();
+    }
+  });
 
   describe('news.json', () => {
     it('60件以上ある', () => {

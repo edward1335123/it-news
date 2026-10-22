@@ -27,9 +27,9 @@
 |---|---|---|---|
 | 1 | 推奨 | SPEC 5章が「正は `shared/src/schemas.ts`」となっており、CLAUDE.md の「SPEC を正とする」と食い違う | 対応済: SPEC を正とし、スキーマがこれを実装すると書き換えた |
 | 2 | 推奨 | SPEC の TS ブロックが確定内容と矛盾する（summary「200字程度」、tags が `string[]`）。余分な空行 | 対応済: 200字以内、`TagId[]`、endAt・capacity の制約を追記し、空行を削除 |
-| 3 | 推奨 | `z.object` は未知のキーを黙って取り除くので、モックJSONでキー名を打ち間違えても検出できない | 持ち越し: スキーマを strict にすると、フェーズ2以降でアプリが collector の新しい項目を受け付けなくなる。方針（strict にするか、テストだけ strict にするか）をフェーズ2〜5で決める |
+| 3 | 推奨 | `z.object` は未知のキーを黙って取り除くので、モックJSONでキー名を打ち間違えても検出できない | 対応済: アプリ用スキーマは未知のキーを無視したままにし、mockData.test.ts でだけ strict に検証する（collector が先に項目を足してもアプリは壊れない） |
 | 4 | 推奨 | 境界値・異常系のテスト不足 | 対応済: タイムゾーンなしの日時、`data:` URL、`http://`、summary ちょうど200字、endAt = startAt、負の capacity/accepted、events/sources の ID 重複のテストを追加 |
-| 5 | 推奨 | 型名 `Event` が DOM の `Event` と同名で、React コードで紛らわしい | 持ち越し: SPEC の型名を変える判断になるため、フェーズ2の着手時に `TechEvent` などへの改名か別名 export を検討する |
+| 5 | 推奨 | 型名 `Event` が DOM の `Event` と同名で、React コードで紛らわしい | 対応済: ユーザーの了承を得て `TechEvent` に改名（SPEC・shared） |
 | 6 | 任意 | `connpass-1010` が `capacity: 80, accepted: 96` で定員超過 | 対応不要: connpass では実際に起こる。フェーズ2で100%超の表示を扱う |
 | 7 | 任意 | `z.httpUrl()` は認証情報つき URL（`https://user:pw@...`）を受け付ける | 持ち越し: フェーズ5の URL 正規化で扱う |
 | 8 | 任意 | summary の長さは UTF-16 単位で数える。空の summary や空白だけの title も通る | 持ち越し: フェーズ5で collector の切り詰め処理と数え方を揃える |
@@ -39,5 +39,4 @@
 
 ## ユーザーが確認すべきこと
 
-- 指摘5: フェーズ2で型名 `Event` を `TechEvent` などに改名してよいか（SPEC の型名も変わる）
-- 指摘3: モックのキー名の打ち間違いを検出するため、スキーマを strict にするか
+なし（指摘3・5 はユーザーと相談のうえ対応済）

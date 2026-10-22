@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   type Article,
-  type Event,
+  type TechEvent,
   type Source,
   SUMMARY_MAX_LENGTH,
   articleSchema,
@@ -25,7 +25,7 @@ const article: Article = {
   related: [],
 };
 
-const event: Event = {
+const event: TechEvent = {
   id: 'connpass-1',
   title: '勉強会',
   url: 'https://example.com/e',

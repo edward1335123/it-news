@@ -83,10 +83,10 @@ iPhone（PWA）: JSON を取得して表示。既読・お気に入り・設定�
 フェーズ1で確定。この章を正とし、`shared/src/schemas.ts`（zod スキーマ。型は `z.infer` で導出する）がこれを実装する。
 
 - `news.json`: `{ generatedAt: string; articles: Article[] }`
-- `events.json`: `{ generatedAt: string; events: Event[] }`
+- `events.json`: `{ generatedAt: string; events: TechEvent[] }`
 - `sources.json`: `{ sources: Source[] }`
 - URL は http/https のみ、日時はタイムゾーン付きの ISO 8601、`summary` は200字以内、`tags` は 4.1/4.2 の ID（重複不可）、ID は各ファイル内で一意
-- `Event.endAt` は `startAt` 以降、`capacity`・`accepted` は0以上の整数
+- `TechEvent.endAt` は `startAt` 以降、`capacity`・`accepted` は0以上の整数
 
 ```ts
 type Article = {
@@ -103,7 +103,7 @@ type Article = {
   related: { source: string; url: string }[]; // 重複としてまとめた他の報道
 };
 
-type Event = {
+type TechEvent = { // DOM の Event と区別する
   id: string;
   title: string;
   url: string;
