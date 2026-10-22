@@ -1,5 +1,6 @@
 import { EVENT_FORMAT_IDS, EVENT_FORMATS, EVENT_TYPE_IDS, EVENT_TYPES } from '@itnews/shared';
 import type { EventsFile } from '@itnews/shared';
+import { UpdatedAt } from '../components/DataStatus';
 import { EventCard } from '../components/EventCard';
 import { FilterChips } from '../components/FilterChips';
 import { EmptyView, ErrorView, LoadingView } from '../components/StatusView';
@@ -51,22 +52,26 @@ function EventList({ events, onRetry, filter, now }: Omit<Props, 'onChangeFilter
     );
   }
   const visible = filterEvents(events.data.events, filter, now);
-  if (visible.length === 0) {
-    const filtered = filter.type !== null || filter.format !== null;
-    return (
-      <EmptyView
-        message="予定されているイベントはありません"
-        hint={filtered ? '種別・開催形式の条件を変えてください' : undefined}
-      />
-    );
-  }
+  const filtered = filter.type !== null || filter.format !== null;
   return (
-    <ul className="list">
-      {visible.map((event) => (
-        <li key={event.id}>
-          <EventCard event={event} onAddToCalendar={() => downloadIcs(event)} />
-        </li>
-      ))}
-    </ul>
+    <>
+      <div className="toolbar">
+        <UpdatedAt generatedAt={events.data.generatedAt} now={now} />
+      </div>
+      {visible.length === 0 ? (
+        <EmptyView
+          message="予定されているイベントはありません"
+          hint={filtered ? '種別・開催形式の条件を変えてください' : undefined}
+        />
+      ) : (
+        <ul className="list">
+          {visible.map((event) => (
+            <li key={event.id}>
+              <EventCard event={event} onAddToCalendar={() => downloadIcs(event)} />
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 }

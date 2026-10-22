@@ -2,6 +2,7 @@ import { CATEGORY_TAGS } from '@itnews/shared';
 import type { NewsFile, TagId } from '@itnews/shared';
 import { ArticleList } from '../components/ArticleList';
 import { ChipBar } from '../components/ChipBar';
+import { UpdatedAt } from '../components/DataStatus';
 import { EmptyView, ErrorView, LoadingView } from '../components/StatusView';
 import { Switch } from '../components/Switch';
 import { applyArticleFilter, articlesForTab } from '../lib/filter';
@@ -34,6 +35,7 @@ export function NewsView({
     <>
       <ChipBar tags={CATEGORY_TAGS[tab]} selected={selectedTag} onSelect={onSelectTag} />
       <div className="toolbar">
+        {news.status === 'success' && <UpdatedAt generatedAt={news.data.generatedAt} now={now} />}
         <Switch
           checked={user.prefs.unreadOnly}
           onChange={(unreadOnly) => user.updatePrefs((prev) => ({ ...prev, unreadOnly }))}

@@ -1,12 +1,14 @@
 import { eventsFileSchema, newsFileSchema, sourcesFileSchema } from '@itnews/shared';
 import type { TagId } from '@itnews/shared';
 import { useMemo, useState } from 'react';
+import { OfflineBanner } from './components/DataStatus';
 import { Header } from './components/Header';
 import { TabBar } from './components/TabBar';
 import { TABS, tabId, tabPanelId } from './tabs';
 import type { TabId } from './tabs';
 import type { EventFilter, NewsTab } from './lib/filter';
 import { useNow } from './lib/useNow';
+import { useOnline } from './lib/useOnline';
 import { dataUrl, useRemoteData } from './lib/useRemoteData';
 import { useUserState } from './lib/userState';
 import type { SavedList } from './lib/userState';
@@ -39,6 +41,7 @@ export function App() {
   const [savedList, setSavedList] = useState<SavedList>('favorite');
   const [query, setQuery] = useState('');
   const now = useNow();
+  const online = useOnline();
   const user = useUserState();
 
   const news = useRemoteData(dataUrl('news.json'), parseNews);
@@ -72,6 +75,7 @@ export function App() {
         <Header title={OVERLAY_TITLES[overlay]} onBack={() => setOverlay(null)} />
       )}
       <main className="main">
+        {!online && <OfflineBanner />}
         {overlay === null && (
           <div role="tabpanel" id={tabPanelId(tab)} aria-labelledby={tabId(tab)}>
             {(tab === 'ai' || tab === 'security') && (

@@ -35,3 +35,11 @@ npm run dev      # 開発サーバを起動（http://localhost:5173）
 | `npm run typecheck` | 全ワークスペースの型チェック |
 | `npm run test` | Vitest でテストを実行する |
 | `npm run check` | lint・typecheck・test をまとめて実行する |
+
+## アイコン
+
+`app/public/icon.svg` を元に、PWA のアイコン（`pwa-*.png`、`maskable-icon-512x512.png`、`apple-touch-icon-180x180.png`、`favicon.ico`）を生成してコミットしている。元画像を変えたら次で作り直す。
+
+```sh
+npm run icons -w app
+```

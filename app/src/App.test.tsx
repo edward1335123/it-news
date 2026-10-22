@@ -6,7 +6,7 @@ import {
   eventsFileSchema,
   newsFileSchema,
 } from '@itnews/shared';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import eventsJson from '../public/data/events.json';
@@ -494,6 +494,53 @@ describe('App', () => {
       } finally {
         objectUrl.restore();
       }
+    });
+  });
+
+  describe('最終更新とオフライン', () => {
+    function setOnline(online: boolean) {
+      vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(online);
+      act(() => {
+        window.dispatchEvent(new Event(online ? 'online' : 'offline'));
+      });
+    }
+
+    it('記事とイベントに最終更新時刻を表示する', async () => {
+      const user = userEvent.setup();
+      vi.setSystemTime(new Date('2026-10-22T15:30:00+09:00'));
+      render(<App />);
+      await screen.findAllByRole('article');
+      expect(screen.getByText(/^最終更新/)).toHaveTextContent(
+        '最終更新 2026年10月22日 12:00（3時間前）',
+      );
+
+      await user.click(screen.getByRole('tab', { name: 'イベント' }));
+      expect(screen.getByText(/^最終更新/).querySelector('time')).toHaveAttribute(
+        'datetime',
+        eventsFileSchema.parse(eventsJson).generatedAt,
+      );
+    });
+
+    it('オフラインになると帯を出し、表示中のデータは残す。戻ると帯を消す', async () => {
+      render(<App />);
+      await screen.findAllByRole('article');
+      expect(screen.queryByText(/オフラインです/)).not.toBeInTheDocument();
+
+      setOnline(false);
+      expect(screen.getByRole('status')).toHaveTextContent(
+        'オフラインです。前回取得したデータを表示しています',
+      );
+      expect(cardTitles()).toEqual(expectedArticleTitles(CATEGORY_TAGS.ai));
+
+      setOnline(true);
+      expect(screen.queryByText(/オフラインです/)).not.toBeInTheDocument();
+    });
+
+    it('オフラインで起動したときも帯を出す', async () => {
+      vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+      render(<App />);
+      await screen.findAllByRole('article');
+      expect(screen.getByText(/オフラインです/)).toBeInTheDocument();
     });
   });
 });

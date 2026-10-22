@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 全面を塗り、図柄はマスカブルアイコンの安全領域（中心から半径 40%）に収める -->
+  <rect width="512" height="512" fill="#4338ca"/>
+  <rect x="156" y="126" width="200" height="260" rx="24" fill="#ffffff"/>
+  <rect x="186" y="160" width="140" height="44" rx="8" fill="#4338ca"/>
+  <rect x="186" y="230" width="140" height="18" rx="9" fill="#a5b4fc"/>
+  <rect x="186" y="272" width="140" height="18" rx="9" fill="#a5b4fc"/>
+  <rect x="186" y="314" width="92" height="18" rx="9" fill="#a5b4fc"/>
+</svg>
