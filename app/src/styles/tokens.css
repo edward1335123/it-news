@@ -1,0 +1,73 @@
+/*
+ * デザイントークン（色・余白・文字サイズ）。
+ * 色はコントラスト比 AA（本文 4.5:1 以上）を満たす組み合わせにする。
+ */
+:root {
+  color-scheme: light dark;
+
+  /* 色 */
+  --color-bg: #f2f3f7;
+  --color-surface: #ffffff;
+  --color-surface-muted: #e8eaf0;
+  --color-text: #111827;
+  --color-text-muted: #4b5563;
+  --color-border: #d6d9e0;
+  --color-accent: #4338ca;
+  --color-on-accent: #ffffff;
+  --color-hot: #b91c1c;
+  --color-hot-bg: #fee2e2;
+  --color-focus: #2563eb;
+  --color-bar: rgb(255 255 255 / 0.92);
+
+  /* 余白（4px 刻み） */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* 文字サイズ */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.8125rem;
+  --font-size-md: 0.9375rem;
+  --font-size-lg: 1.0625rem;
+  --font-size-xl: 1.375rem;
+  --line-height: 1.5;
+  --font-family:
+    -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Noto Sans JP',
+    'Segoe UI', sans-serif;
+
+  /* 形状 */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-full: 999px;
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.06);
+
+  /* タップ領域の最小サイズ（SPEC 9章: 44pt 以上） */
+  --tap-size: 44px;
+
+  /* セーフエリア */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0b0d12;
+    --color-surface: #171a21;
+    --color-surface-muted: #232733;
+    --color-text: #f3f4f6;
+    --color-text-muted: #a3a9b6;
+    --color-border: #2e3340;
+    --color-accent: #a5b4fc;
+    --color-on-accent: #111827;
+    --color-hot: #fca5a5;
+    --color-hot-bg: #3f1d1d;
+    --color-focus: #93c5fd;
+    --color-bar: rgb(23 26 33 / 0.92);
+    --shadow-card: none;
+  }
+}
