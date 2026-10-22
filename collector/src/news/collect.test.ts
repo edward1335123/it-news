@@ -70,6 +70,16 @@ describe('toArticles', () => {
     ]);
   });
 
+  it('news.json のスキーマに通らない URL の記事は捨て、他の記事は残す', () => {
+    const items: FeedItem[] = [
+      { title: 'IP address link', url: 'http://1.2.3.4/a', publishedAt: iso(NOW) },
+      { title: 'Valid link', url: '/ok', publishedAt: iso(NOW) },
+    ];
+    const articles = toArticles(src, items, NOW);
+    expect(articles.map((a) => a.url)).toEqual(['https://news.example/ok']);
+    expect(newsFileSchema.safeParse({ generatedAt: iso(NOW), articles }).success).toBe(true);
+  });
+
   it('抜粋を200字に切り詰め、arXiv の前置きを除く', () => {
     const long = 'x'.repeat(500);
     const [a] = toArticles(src, [{ title: 'T', url: 'https://n.example/1', summary: long }], NOW);

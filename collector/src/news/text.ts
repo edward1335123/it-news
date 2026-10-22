@@ -51,10 +51,10 @@ export function stripTags(html: string): string {
 
 /**
  * フィードの文字列をプレーンテキストにする。
- * エスケープされた HTML（`&lt;p&gt;`）にも対応するため、タグを除く前後で文字参照を戻す。
+ * エスケープされた HTML（`&lt;p&gt;`・`&amp;lt;p&amp;gt;`）にも対応するため、文字参照の復元とタグの除去を2回くり返す。
  */
 export function toPlainText(raw: string): string {
-  return decodeEntities(stripTags(decodeEntities(raw)))
+  return stripTags(decodeEntities(stripTags(decodeEntities(raw))))
     .replace(/\s+/g, ' ')
     .trim();
 }

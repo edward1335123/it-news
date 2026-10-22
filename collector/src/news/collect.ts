@@ -1,4 +1,4 @@
-import { SUMMARY_MAX_LENGTH } from '@itnews/shared';
+import { SUMMARY_MAX_LENGTH, articleSchema } from '@itnews/shared';
 import type { Article, Source } from '@itnews/shared';
 import { classify } from './classify';
 import { mergeArticles } from './dedupe';
@@ -61,8 +61,7 @@ export function toArticles(source: Source, items: readonly FeedItem[], now: numb
     const { category, tags, matchedKeyword } = classify({ title, summary }, source, profile);
     if (profile.requireKeywordTag === true && !matchedKeyword) continue;
 
-    seen.add(id);
-    articles.push({
+    const article: Article = {
       id,
       title,
       url,
@@ -74,7 +73,11 @@ export function toArticles(source: Source, items: readonly FeedItem[], now: numb
       tags,
       score: 0,
       related: [],
-    });
+    };
+    // スキーマに通らない記事が1件あると news.json 全体を出力できないので、ここで捨てる
+    if (!articleSchema.safeParse(article).success) continue;
+    seen.add(id);
+    articles.push(article);
   }
 
   return sortNewest(articles).slice(0, profile.maxItems ?? DEFAULT_MAX_ITEMS);

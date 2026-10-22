@@ -1,11 +1,15 @@
 import { createHash } from 'node:crypto';
+import { z } from 'zod';
 
 /** 計測用で、記事の同一性に関係しないクエリパラメータ */
 const TRACKING_PARAM =
   /^(utm_\w+|fbclid|gclid|yclid|msclkid|mc_cid|mc_eid|_hsenc|_hsmi|igshid|ref|ref_src)$/i;
 
+/** news.json のスキーマ（shared の `z.httpUrl()`）と同じ判定。IP アドレスや `_` を含むホストなどは通らない */
+const webUrl = z.httpUrl();
+
 /**
- * 記事の URL を整える。http/https 以外や解釈できない URL は null。
+ * 記事の URL を整える。http/https 以外や解釈できない URL、スキーマに通らない URL は null。
  * フラグメント・認証情報・計測用パラメータを除き、残りのパラメータを並べ替える。
  */
 export function cleanUrl(raw: string, base?: string): string | null {
@@ -23,7 +27,7 @@ export function cleanUrl(raw: string, base?: string): string | null {
     if (TRACKING_PARAM.test(key)) url.searchParams.delete(key);
   }
   url.searchParams.sort();
-  return url.href;
+  return webUrl.safeParse(url.href).success ? url.href : null;
 }
 
 /**

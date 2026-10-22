@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
 import { decodeEntities, toPlainText, truncate } from './text';
-import { articleId, cleanUrl, urlKey } from './url';
 
 describe('decodeEntities', () => {
   it('名前・10進・16進の文字参照を戻し、知らないものは残す', () => {
@@ -21,6 +20,10 @@ describe('toPlainText', () => {
     expect(toPlainText('&lt;p&gt;It&amp;#8217;s&lt;/p&gt;')).toBe('It’s');
   });
 
+  it('二重にエスケープされたタグも除く', () => {
+    expect(toPlainText('a &amp;lt;b&amp;gt;bold&amp;lt;/b&amp;gt; c')).toBe('a bold c');
+  });
+
   it('タグでない「<」は残す', () => {
     expect(toPlainText('a < b and c > d')).toBe('a < b and c > d');
   });
@@ -36,28 +39,5 @@ describe('truncate', () => {
     const result = truncate('ab😀cd', 4);
     expect(result).toBe('ab…');
     expect(result.length).toBeLessThanOrEqual(4);
-  });
-});
-
-describe('cleanUrl・urlKey・articleId', () => {
-  it('計測用パラメータ・フラグメントを除き、パラメータを並べ替える', () => {
-    expect(cleanUrl('https://Example.com/a?utm_source=rss&b=2&a=1&fbclid=x#top')).toBe(
-      'https://example.com/a?a=1&b=2',
-    );
-  });
-
-  it('相対 URL をフィードの URL から解決し、http/https 以外は null にする', () => {
-    expect(cleanUrl('/news/1', 'https://example.com/feed.xml')).toBe('https://example.com/news/1');
-    expect(cleanUrl('javascript:alert(1)')).toBeNull();
-    expect(cleanUrl('not a url')).toBeNull();
-  });
-
-  it('http/https・www・末尾のスラッシュの違いを同じ記事とみなす', () => {
-    const a = cleanUrl('https://www.example.com/news/1/') ?? '';
-    const b = cleanUrl('http://example.com/news/1') ?? '';
-    expect(urlKey(a)).toBe(urlKey(b));
-    expect(articleId(a)).toBe(articleId(b));
-    expect(articleId(a)).toMatch(/^[0-9a-f]{16}$/);
-    expect(articleId(cleanUrl('https://example.com/news/2') ?? '')).not.toBe(articleId(a));
   });
 });

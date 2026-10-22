@@ -1,4 +1,4 @@
-import { readFile, rename, writeFile } from 'node:fs/promises';
+import { copyFile, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { newsFileSchema, sourcesFileSchema } from '@itnews/shared';
 import type { Article } from '@itnews/shared';
@@ -66,6 +66,24 @@ async function readPrevious(): Promise<Article[]> {
   return [];
 }
 
+/**
+ * 書き込み途中のファイルを配信しないよう、一時ファイルに書いてから置き換える。
+ * Windows では置き換え先を他のプロセス（開発サーバーなど）が開いていると rename が
+ * EPERM・EACCES・EBUSY になるので、そのときは上書きコピーする。
+ */
+async function writeAtomically(path: string, content: string): Promise<void> {
+  const temp = `${path}.tmp`;
+  await writeFile(temp, content, 'utf8');
+  try {
+    await rename(temp, path);
+  } catch (error) {
+    const code = error instanceof Error && 'code' in error ? error.code : undefined;
+    if (code !== 'EPERM' && code !== 'EACCES' && code !== 'EBUSY') throw error;
+    await copyFile(temp, path);
+    await rm(temp, { force: true });
+  }
+}
+
 async function main(): Promise<void> {
   const { sources } = sourcesFileSchema.parse(await readJson(SOURCES_PATH));
   const previous = await readPrevious();
@@ -85,10 +103,7 @@ async function main(): Promise<void> {
   }
 
   const file = newsFileSchema.parse({ generatedAt: new Date(now).toISOString(), articles });
-  // 書き込み途中のファイルを配信しないよう、一時ファイルに書いてから置き換える
-  const temp = `${NEWS_PATH}.tmp`;
-  await writeFile(temp, `${JSON.stringify(file)}\n`, 'utf8');
-  await rename(temp, NEWS_PATH);
+  await writeAtomically(NEWS_PATH, `${JSON.stringify(file)}\n`);
 
   log.info(
     `[news] news.json に ${articles.length}件を出力（取得失敗 ${failures.length}/${sources.length}）`,

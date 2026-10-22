@@ -89,7 +89,8 @@ function findDuplicate(clusters: readonly Cluster[], candidate: Cluster): Cluste
 /**
  * 記事の重複を除く（SPEC 7章）。
  * 正規化 URL が一致するもの（既存の記事やまとめた報道を含む）は捨て、
- * タイトルが似ている別の情報源の記事は、先に公開された記事の `related` にまとめる。
+ * タイトルが似ている別の情報源の記事は、既にある記事（前回の記事、または今回の記事のうち先に公開されたもの）の
+ * `related` にまとめる。
  */
 export function mergeArticles(
   existing: readonly Article[],
