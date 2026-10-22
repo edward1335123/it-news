@@ -80,13 +80,13 @@ iPhone（PWA）: JSON を取得して表示。既読・お気に入り・設定�
 
 ## 5. データ形式
 
-フェーズ1で確定。正は `shared/src/schemas.ts`（zod スキーマ。型は `z.infer` で導出する）。
+フェーズ1で確定。この章を正とし、`shared/src/schemas.ts`（zod スキーマ。型は `z.infer` で導出する）がこれを実装する。
 
 - `news.json`: `{ generatedAt: string; articles: Article[] }`
 - `events.json`: `{ generatedAt: string; events: Event[] }`
 - `sources.json`: `{ sources: Source[] }`
 - URL は http/https のみ、日時はタイムゾーン付きの ISO 8601、`summary` は200字以内、`tags` は 4.1/4.2 の ID（重複不可）、ID は各ファイル内で一意
-
+- `Event.endAt` は `startAt` 以降、`capacity`・`accepted` は0以上の整数
 
 ```ts
 type Article = {
@@ -96,9 +96,9 @@ type Article = {
   source: string;          // Source.id
   lang: "ja" | "en";
   publishedAt: string;     // ISO 8601
-  summary?: string;        // RSSの抜粋（200字程度に切り詰め）
+  summary?: string;        // RSSの抜粋（200字以内に切り詰め）
   category: "ai" | "security" | "general";
-  tags: string[];          // 4.1/4.2 の ID
+  tags: TagId[];           // 4.1/4.2 の ID（重複不可）
   score: number;           // 注目度
   related: { source: string; url: string }[]; // 重複としてまとめた他の報道
 };
@@ -110,11 +110,11 @@ type Event = {
   source: "connpass" | "doorkeeper" | "techplay" | "manual";
   type: "expo" | "conference" | "meetup";
   format: "offline" | "online" | "hybrid";
-  startAt: string; endAt?: string;
+  startAt: string; endAt?: string; // endAt >= startAt
   venue?: string; address?: string;
   organizer?: string;
-  capacity?: number; accepted?: number;
-  tags: string[];
+  capacity?: number; accepted?: number; // 0以上の整数
+  tags: TagId[];
 };
 
 type Source = { id: string; name: string; url: string; feed: string; lang: "ja" | "en"; defaultCategory: Article["category"]; };
