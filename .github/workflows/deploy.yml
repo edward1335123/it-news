@@ -1,0 +1,88 @@
+# 収集 → ビルド → Cloudflare Pages へのデプロイ（手順と Secrets は docs/DEPLOY.md）
+name: deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 毎時。0分ちょうどは混み合って遅れやすいので少しずらす
+    - cron: '17 * * * *'
+  workflow_dispatch:
+
+# 前回の data/*.json を引き継ぐので、同時に2つ走らせない（後から来た実行は待つ）
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      # 定時実行ではコードが変わらないので、Actions の利用時間を抑えるため push のときだけ検証する
+      - name: lint・型・テスト
+        if: github.event_name != 'schedule'
+        run: npm run check
+
+      # news.json・events.json は git 管理外なので、前回の実行で保存したものを戻す。
+      # キーは毎回変わるので、restore-keys で一番新しいものが選ばれる
+      - name: 前回のデータを戻す
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            app/public/data/news.json
+            app/public/data/events.json
+          key: data-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: data-
+
+      # 一部の情報源が失敗してもデプロイは続ける（失敗はログに残る）。
+      # 全滅したときは前回のファイルがそのまま残る
+      - name: ニュースとイベントを収集
+        timeout-minutes: 15
+        env:
+          CONNPASS_API_KEY: ${{ secrets.CONNPASS_API_KEY }}
+        run: |
+          npm run collect:news &
+          news=$!
+          npm run collect:events &
+          events=$!
+          wait "$news" || echo "::warning::ニュースの収集に失敗した。前回の news.json を使う"
+          wait "$events" || echo "::warning::イベントの収集に失敗した。前回の events.json を使う"
+
+      - name: データがあるか確かめる
+        run: |
+          for f in news.json events.json; do
+            test -s "app/public/data/$f" || { echo "::error::app/public/data/$f がない"; exit 1; }
+          done
+
+      - name: データを次回のために保存する
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            app/public/data/news.json
+            app/public/data/events.json
+          key: data-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - run: npm run build
+
+      # --branch=main で本番（Production）のデプロイになる
+      - name: Cloudflare Pages にデプロイ
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
+        run: |
+          test -n "$PROJECT" || { echo "::error::Variables に CLOUDFLARE_PAGES_PROJECT がない"; exit 1; }
+          npx --yes wrangler@4 pages deploy app/dist --project-name="$PROJECT" --branch=main --commit-dirty=true
