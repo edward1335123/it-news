@@ -1,0 +1,220 @@
+{
+  "sources": [
+    {
+      "id": "openai",
+      "name": "OpenAI",
+      "url": "https://openai.com/news/",
+      "feed": "https://openai.com/news/rss.xml",
+      "lang": "en",
+      "defaultCategory": "ai"
+    },
+    {
+      "id": "google-deepmind",
+      "name": "Google DeepMind",
+      "url": "https://deepmind.google/",
+      "feed": "https://deepmind.google/blog/rss.xml",
+      "lang": "en",
+      "defaultCategory": "ai"
+    },
+    {
+      "id": "hugging-face",
+      "name": "Hugging Face",
+      "url": "https://huggingface.co/blog",
+      "feed": "https://huggingface.co/blog/feed.xml",
+      "lang": "en",
+      "defaultCategory": "ai"
+    },
+    {
+      "id": "github-blog",
+      "name": "GitHub Blog",
+      "url": "https://github.blog/",
+      "feed": "https://github.blog/feed/",
+      "lang": "en",
+      "defaultCategory": "ai"
+    },
+    {
+      "id": "nvidia-blog",
+      "name": "NVIDIA Blog",
+      "url": "https://blogs.nvidia.com/",
+      "feed": "https://blogs.nvidia.com/feed/",
+      "lang": "en",
+      "defaultCategory": "ai"
+    },
+    {
+      "id": "itmedia-aiplus",
+      "name": "ITmedia AI+",
+      "url": "https://www.itmedia.co.jp/aiplus/",
+      "feed": "https://rss.itmedia.co.jp/rss/2.0/aiplus.xml",
+      "lang": "ja",
+      "defaultCategory": "ai"
+    },
+    {
+      "id": "the-decoder",
+      "name": "The Decoder",
+      "url": "https://the-decoder.com/",
+      "feed": "https://the-decoder.com/feed/",
+      "lang": "en",
+      "defaultCategory": "ai"
+    },
+    {
+      "id": "techcrunch-ai",
+      "name": "TechCrunch AI",
+      "url": "https://techcrunch.com/category/artificial-intelligence/",
+      "feed": "https://techcrunch.com/category/artificial-intelligence/feed/",
+      "lang": "en",
+      "defaultCategory": "ai"
+    },
+    {
+      "id": "simon-willison",
+      "name": "Simon Willison",
+      "url": "https://simonwillison.net/",
+      "feed": "https://simonwillison.net/atom/everything/",
+      "lang": "en",
+      "defaultCategory": "ai"
+    },
+    {
+      "id": "arxiv-cs-ai",
+      "name": "arXiv cs.AI",
+      "url": "https://arxiv.org/list/cs.AI/recent",
+      "feed": "https://rss.arxiv.org/rss/cs.AI",
+      "lang": "en",
+      "defaultCategory": "ai"
+    },
+    {
+      "id": "zenn",
+      "name": "Zenn",
+      "url": "https://zenn.dev/",
+      "feed": "https://zenn.dev/feed",
+      "lang": "ja",
+      "defaultCategory": "general"
+    },
+    {
+      "id": "qiita",
+      "name": "Qiita",
+      "url": "https://qiita.com/",
+      "feed": "https://qiita.com/popular-items/feed",
+      "lang": "ja",
+      "defaultCategory": "general"
+    },
+    {
+      "id": "hatena-it",
+      "name": "はてなブックマーク（テクノロジー）",
+      "url": "https://b.hatena.ne.jp/hotentry/it",
+      "feed": "https://b.hatena.ne.jp/hotentry/it.rss",
+      "lang": "ja",
+      "defaultCategory": "general"
+    },
+    {
+      "id": "hacker-news",
+      "name": "Hacker News",
+      "url": "https://news.ycombinator.com/",
+      "feed": "https://hnrss.org/frontpage",
+      "lang": "en",
+      "defaultCategory": "general"
+    },
+    {
+      "id": "publickey",
+      "name": "Publickey",
+      "url": "https://www.publickey1.jp/",
+      "feed": "https://www.publickey1.jp/atom.xml",
+      "lang": "ja",
+      "defaultCategory": "general"
+    },
+    {
+      "id": "itmedia-news",
+      "name": "ITmedia NEWS",
+      "url": "https://www.itmedia.co.jp/news/",
+      "feed": "https://rss.itmedia.co.jp/rss/2.0/news_bursts.xml",
+      "lang": "ja",
+      "defaultCategory": "general"
+    },
+    {
+      "id": "gihyo",
+      "name": "gihyo.jp",
+      "url": "https://gihyo.jp/",
+      "feed": "https://gihyo.jp/feed/rss2",
+      "lang": "ja",
+      "defaultCategory": "general"
+    },
+    {
+      "id": "jpcert",
+      "name": "JPCERT/CC",
+      "url": "https://www.jpcert.or.jp/",
+      "feed": "https://www.jpcert.or.jp/rss/jpcert.rdf",
+      "lang": "ja",
+      "defaultCategory": "security"
+    },
+    {
+      "id": "ipa",
+      "name": "IPA",
+      "url": "https://www.ipa.go.jp/security/",
+      "feed": "https://www.ipa.go.jp/security/alert-rss.rdf",
+      "lang": "ja",
+      "defaultCategory": "security"
+    },
+    {
+      "id": "security-next",
+      "name": "Security NEXT",
+      "url": "https://www.security-next.com/",
+      "feed": "https://www.security-next.com/feed",
+      "lang": "ja",
+      "defaultCategory": "security"
+    },
+    {
+      "id": "piyolog",
+      "name": "piyolog",
+      "url": "https://piyolog.hatenadiary.jp/",
+      "feed": "https://piyolog.hatenadiary.jp/feed",
+      "lang": "ja",
+      "defaultCategory": "security"
+    },
+    {
+      "id": "the-hacker-news",
+      "name": "The Hacker News",
+      "url": "https://thehackernews.com/",
+      "feed": "https://feeds.feedburner.com/TheHackersNews",
+      "lang": "en",
+      "defaultCategory": "security"
+    },
+    {
+      "id": "bleepingcomputer",
+      "name": "BleepingComputer",
+      "url": "https://www.bleepingcomputer.com/",
+      "feed": "https://www.bleepingcomputer.com/feed/",
+      "lang": "en",
+      "defaultCategory": "security"
+    },
+    {
+      "id": "krebs-on-security",
+      "name": "Krebs on Security",
+      "url": "https://krebsonsecurity.com/",
+      "feed": "https://krebsonsecurity.com/feed/",
+      "lang": "en",
+      "defaultCategory": "security"
+    },
+    {
+      "id": "cisa-kev",
+      "name": "CISA KEV",
+      "url": "https://www.cisa.gov/known-exploited-vulnerabilities-catalog",
+      "feed": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json",
+      "lang": "en",
+      "defaultCategory": "security"
+    },
+    {
+      "id": "unit42",
+      "name": "Unit 42",
+      "url": "https://unit42.paloaltonetworks.com/",
+      "feed": "https://unit42.paloaltonetworks.com/feed/",
+      "lang": "en",
+      "defaultCategory": "security"
+    },
+    {
+      "id": "microsoft-msrc",
+      "name": "Microsoft MSRC",
+      "url": "https://msrc.microsoft.com/",
+      "feed": "https://api.msrc.microsoft.com/update-guide/rss",
+      "lang": "en",
+      "defaultCategory": "security"
+    }
+  ]
+}

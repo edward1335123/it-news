@@ -15,6 +15,7 @@
     "dev": "npm run dev -w app",
     "build": "npm run build -w app",
     "preview": "npm run preview -w app",
+    "collect:news": "npm run collect:news -w collector",
     "lint": "eslint . --max-warnings 0 && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "tsc -p tsconfig.json && npm run typecheck --workspaces",

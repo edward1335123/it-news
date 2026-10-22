@@ -7,3 +7,7 @@ dist/
 .DS_Store
 .claude/settings.local.json
 coverage/
+
+# collector が生成する実データ（モックは app/mock/ にある）
+app/public/data/news.json
+app/public/data/*.tmp
