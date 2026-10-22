@@ -536,6 +536,15 @@ describe('App', () => {
       expect(screen.queryByText(/オフラインです/)).not.toBeInTheDocument();
     });
 
+    it('オフラインでデータを取得できなかったときは、前回のデータを表示しているとは書かない', async () => {
+      vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
+      stubFetch(new Set(['/data/news.json']));
+      render(<App />);
+      expect(await screen.findByRole('status')).toHaveTextContent(
+        'オフラインです。通信できるようになってから再読み込みしてください',
+      );
+    });
+
     it('オフラインで起動したときも帯を出す', async () => {
       vi.spyOn(navigator, 'onLine', 'get').mockReturnValue(false);
       render(<App />);

@@ -58,6 +58,10 @@ export function App() {
     [sources.state],
   );
 
+  // 表示中の画面が使うデータ。保存タブ・検索は記事のデータを使う
+  const visibleData =
+    overlay === 'settings' ? sources : overlay === null && tab === 'events' ? events : news;
+
   const changeTab = (next: TabId) => {
     setOverlay(null);
     setTab(next);
@@ -75,7 +79,7 @@ export function App() {
         <Header title={OVERLAY_TITLES[overlay]} onBack={() => setOverlay(null)} />
       )}
       <main className="main">
-        {!online && <OfflineBanner />}
+        {!online && <OfflineBanner hasData={visibleData.state.status === 'success'} />}
         {overlay === null && (
           <div role="tabpanel" id={tabPanelId(tab)} aria-labelledby={tabId(tab)}>
             {(tab === 'ai' || tab === 'security') && (

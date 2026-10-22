@@ -33,12 +33,21 @@ export const DATA_CACHE_NAME = 'itnews-data';
 export const pwaOptions = {
   registerType: 'autoUpdate',
   injectRegister: 'script-defer',
+  // Cloudflare Access の Cookie を付けて manifest を取得する
+  useCredentials: true,
   manifest,
+  // manifest のアイコンは globPatterns の png で拾うので、重ねて登録しない
+  includeManifestIcons: false,
   workbox: {
     // 画面の部品は事前にキャッシュする。data/*.json は更新されるので含めない
     globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
     navigateFallback: 'index.html',
+    // Cloudflare Access のログイン・ログアウトの URL は index.html で返さない
+    navigateFallbackDenylist: [/^\/cdn-cgi\//],
     cleanupOutdatedCaches: true,
+    // 新しい SW をすぐ有効にし、初回訪問のページも制御する（data/*.json をキャッシュするため）
+    skipWaiting: true,
+    clientsClaim: true,
     runtimeCaching: [
       {
         // 通信できるときは最新を取り、オフラインや応答が遅いときは前回のデータを返す

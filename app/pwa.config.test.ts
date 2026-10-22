@@ -79,6 +79,18 @@ describe('Service Worker のキャッシュ', () => {
     expect(matches('https://other.example.com/data/news.json', false)).toBe(false);
   });
 
+  it('新しい SW をすぐ有効にし、初回訪問のページも制御する', () => {
+    expect(pwaOptions.workbox.skipWaiting).toBe(true);
+    expect(pwaOptions.workbox.clientsClaim).toBe(true);
+  });
+
+  it('Cloudflare Access の URL は index.html で返さない', () => {
+    const denied = (path: string) =>
+      pwaOptions.workbox.navigateFallbackDenylist.some((re) => re.test(path));
+    expect(denied('/cdn-cgi/access/logout')).toBe(true);
+    expect(denied('/')).toBe(false);
+  });
+
   it('データの JSON は事前キャッシュに含めない', () => {
     expect(pwaOptions.workbox.globPatterns.join()).not.toContain('json');
   });
