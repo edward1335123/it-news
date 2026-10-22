@@ -15,7 +15,7 @@
     "dev": "npm run dev -w app",
     "build": "npm run build -w app",
     "preview": "npm run preview -w app",
-    "lint": "eslint . && prettier --check .",
+    "lint": "eslint . --max-warnings 0 && prettier --check .",
     "format": "prettier --write .",
     "typecheck": "tsc -p tsconfig.json && npm run typecheck --workspaces",
     "test": "vitest run",
