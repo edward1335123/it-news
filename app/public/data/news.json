@@ -1,0 +1,904 @@
+{
+  "generatedAt": "2026-10-22T03:00:00.000Z",
+  "articles": [
+    {
+      "id": "ca785095df48cdc5",
+      "title": "Claude Code のサブエージェントで大規模リファクタリングを並列化した話",
+      "url": "https://example.com/mock/zenn/1",
+      "source": "zenn",
+      "lang": "ja",
+      "publishedAt": "2026-10-22T02:30:00.000Z",
+      "summary": "Claude Code のサブエージェントで大規模リファクタリングを並列化した話。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-dev"],
+      "score": 40,
+      "related": [
+        {
+          "source": "hacker-news",
+          "url": "https://example.com/mock/hacker-news/related-1-1"
+        },
+        {
+          "source": "itmedia-news",
+          "url": "https://example.com/mock/itmedia-news/related-1-2"
+        }
+      ]
+    },
+    {
+      "id": "7c855cbe032b43bc",
+      "title": "Copilot coding agent now supports custom review instructions",
+      "url": "https://example.com/mock/github-blog/2",
+      "source": "github-blog",
+      "lang": "en",
+      "publishedAt": "2026-10-21T17:00:00.000Z",
+      "summary": "Copilot coding agent now supports custom review instructions. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-dev", "ai-agent"],
+      "score": 47,
+      "related": []
+    },
+    {
+      "id": "e5aaeb05d66559e5",
+      "title": "仕様駆動開発ツール Kiro、チーム向けプランを提供開始",
+      "url": "https://example.com/mock/publickey/3",
+      "source": "publickey",
+      "lang": "ja",
+      "publishedAt": "2026-10-21T07:30:00.000Z",
+      "summary": "仕様駆動開発ツール Kiro、チーム向けプランを提供開始。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-dev"],
+      "score": 84,
+      "related": []
+    },
+    {
+      "id": "19ae3ea99b3533cb",
+      "title": "Notes on vibe coding a small CLI tool in an afternoon",
+      "url": "https://example.com/mock/simon-willison/4",
+      "source": "simon-willison",
+      "lang": "en",
+      "publishedAt": "2026-10-20T22:00:00.000Z",
+      "summary": "Notes on vibe coding a small CLI tool in an afternoon. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-dev"],
+      "score": 31,
+      "related": []
+    },
+    {
+      "id": "1edf03eef4855af6",
+      "title": "New tools for building agents with the Responses API",
+      "url": "https://example.com/mock/openai/5",
+      "source": "openai",
+      "lang": "en",
+      "publishedAt": "2026-10-20T12:30:00.000Z",
+      "category": "ai",
+      "tags": ["ai-agent"],
+      "score": 68,
+      "related": []
+    },
+    {
+      "id": "bda23dc7e3d1bf8c",
+      "title": "MCP 対応の社内ツール連携、国内企業で導入広がる",
+      "url": "https://example.com/mock/itmedia-aiplus/6",
+      "source": "itmedia-aiplus",
+      "lang": "ja",
+      "publishedAt": "2026-10-20T03:00:00.000Z",
+      "summary": "MCP 対応の社内ツール連携、国内企業で導入広がる。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-agent"],
+      "score": 15,
+      "related": []
+    },
+    {
+      "id": "e23162abae6125e3",
+      "title": "A2A protocol gains support from major cloud providers",
+      "url": "https://example.com/mock/the-decoder/7",
+      "source": "the-decoder",
+      "lang": "en",
+      "publishedAt": "2026-10-19T17:30:00.000Z",
+      "summary": "A2A protocol gains support from major cloud providers. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-agent"],
+      "score": 67,
+      "related": [
+        {
+          "source": "hacker-news",
+          "url": "https://example.com/mock/hacker-news/related-7-1"
+        }
+      ]
+    },
+    {
+      "id": "3a5a51c54c7379ee",
+      "title": "ブラウザ操作エージェントで定型業務を自動化してみた",
+      "url": "https://example.com/mock/qiita/8",
+      "source": "qiita",
+      "lang": "ja",
+      "publishedAt": "2026-10-19T08:00:00.000Z",
+      "summary": "ブラウザ操作エージェントで定型業務を自動化してみた。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-agent"],
+      "score": 89,
+      "related": []
+    },
+    {
+      "id": "9109ca0e2a6c39ca",
+      "title": "Model release notes: improved reasoning and lower API pricing",
+      "url": "https://example.com/mock/openai/9",
+      "source": "openai",
+      "lang": "en",
+      "publishedAt": "2026-10-18T22:30:00.000Z",
+      "summary": "Model release notes: improved reasoning and lower API pricing. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-model"],
+      "score": 36,
+      "related": []
+    },
+    {
+      "id": "ab6fd733e73104eb",
+      "title": "New Gemini model tops long-context benchmarks",
+      "url": "https://example.com/mock/google-deepmind/10",
+      "source": "google-deepmind",
+      "lang": "en",
+      "publishedAt": "2026-10-18T13:00:00.000Z",
+      "category": "ai",
+      "tags": ["ai-model"],
+      "score": 73,
+      "related": []
+    },
+    {
+      "id": "9b28f72b2eb8b0d6",
+      "title": "主要 LLM の API 料金を比較、10月の改定を反映",
+      "url": "https://example.com/mock/itmedia-aiplus/11",
+      "source": "itmedia-aiplus",
+      "lang": "ja",
+      "publishedAt": "2026-10-18T03:30:00.000Z",
+      "summary": "主要 LLM の API 料金を比較、10月の改定を反映。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-model"],
+      "score": 20,
+      "related": []
+    },
+    {
+      "id": "5dac067b6f7396eb",
+      "title": "Benchmarking frontier models on real-world coding tasks",
+      "url": "https://example.com/mock/hacker-news/12",
+      "source": "hacker-news",
+      "lang": "en",
+      "publishedAt": "2026-10-17T18:00:00.000Z",
+      "summary": "Benchmarking frontier models on real-world coding tasks. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-model", "ai-dev"],
+      "score": 57,
+      "related": []
+    },
+    {
+      "id": "a2dcff3cca79edfc",
+      "title": "Open-weight model family released under Apache 2.0",
+      "url": "https://example.com/mock/hugging-face/13",
+      "source": "hugging-face",
+      "lang": "en",
+      "publishedAt": "2026-10-17T08:30:00.000Z",
+      "summary": "Open-weight model family released under Apache 2.0. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-oss"],
+      "score": 124,
+      "related": [
+        {
+          "source": "hacker-news",
+          "url": "https://example.com/mock/hacker-news/related-13-1"
+        },
+        {
+          "source": "itmedia-news",
+          "url": "https://example.com/mock/itmedia-news/related-13-2"
+        }
+      ]
+    },
+    {
+      "id": "efe996961df48560",
+      "title": "Ollama と llama.cpp で 32B モデルを手元の Mac で動かす",
+      "url": "https://example.com/mock/zenn/14",
+      "source": "zenn",
+      "lang": "ja",
+      "publishedAt": "2026-10-16T23:00:00.000Z",
+      "summary": "Ollama と llama.cpp で 32B モデルを手元の Mac で動かす。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-oss"],
+      "score": 41,
+      "related": []
+    },
+    {
+      "id": "f284d9d24029dbb9",
+      "title": "llama.cpp adds speculative decoding for more architectures",
+      "url": "https://example.com/mock/hacker-news/15",
+      "source": "hacker-news",
+      "lang": "en",
+      "publishedAt": "2026-10-16T13:30:00.000Z",
+      "category": "ai",
+      "tags": ["ai-oss"],
+      "score": 78,
+      "related": []
+    },
+    {
+      "id": "779d63ab8536e728",
+      "title": "ローカル LLM の日本語性能を比較してみた",
+      "url": "https://example.com/mock/hatena-it/16",
+      "source": "hatena-it",
+      "lang": "ja",
+      "publishedAt": "2026-10-16T04:00:00.000Z",
+      "summary": "ローカル LLM の日本語性能を比較してみた。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-oss", "ai-model"],
+      "score": 25,
+      "related": []
+    },
+    {
+      "id": "32848e7e95fc8acc",
+      "title": "Video generation model now produces 60-second clips with audio",
+      "url": "https://example.com/mock/the-decoder/17",
+      "source": "the-decoder",
+      "lang": "en",
+      "publishedAt": "2026-10-15T18:30:00.000Z",
+      "summary": "Video generation model now produces 60-second clips with audio. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-multimodal"],
+      "score": 62,
+      "related": []
+    },
+    {
+      "id": "986980984c7b2daf",
+      "title": "リアルタイム音声対話 API が日本語に対応",
+      "url": "https://example.com/mock/itmedia-aiplus/18",
+      "source": "itmedia-aiplus",
+      "lang": "ja",
+      "publishedAt": "2026-10-15T09:00:00.000Z",
+      "summary": "リアルタイム音声対話 API が日本語に対応。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-multimodal"],
+      "score": 99,
+      "related": []
+    },
+    {
+      "id": "c14d450118f2384f",
+      "title": "Image generation startup launches editing tools for designers",
+      "url": "https://example.com/mock/techcrunch-ai/19",
+      "source": "techcrunch-ai",
+      "lang": "en",
+      "publishedAt": "2026-10-14T23:30:00.000Z",
+      "summary": "Image generation startup launches editing tools for designers. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-multimodal", "ai-business"],
+      "score": 61,
+      "related": [
+        {
+          "source": "hacker-news",
+          "url": "https://example.com/mock/hacker-news/related-19-1"
+        }
+      ]
+    },
+    {
+      "id": "d7871ba66ea1015f",
+      "title": "音声認識と音声合成を組み合わせた対話アプリの作り方",
+      "url": "https://example.com/mock/gihyo/20",
+      "source": "gihyo",
+      "lang": "ja",
+      "publishedAt": "2026-10-14T14:00:00.000Z",
+      "category": "ai",
+      "tags": ["ai-multimodal"],
+      "score": 83,
+      "related": []
+    },
+    {
+      "id": "d7510ddfd543b1fe",
+      "title": "Scaling test-time compute for multi-step reasoning",
+      "url": "https://example.com/mock/arxiv-cs-ai/21",
+      "source": "arxiv-cs-ai",
+      "lang": "en",
+      "publishedAt": "2026-10-14T04:30:00.000Z",
+      "summary": "Scaling test-time compute for multi-step reasoning. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-research"],
+      "score": 30,
+      "related": []
+    },
+    {
+      "id": "7012828b3300cf9f",
+      "title": "A survey of evaluation methods for LLM-based agents",
+      "url": "https://example.com/mock/arxiv-cs-ai/22",
+      "source": "arxiv-cs-ai",
+      "lang": "en",
+      "publishedAt": "2026-10-13T19:00:00.000Z",
+      "summary": "A survey of evaluation methods for LLM-based agents. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-research", "ai-agent"],
+      "score": 67,
+      "related": []
+    },
+    {
+      "id": "d74dd52e146320e5",
+      "title": "Research update: learning world models from video",
+      "url": "https://example.com/mock/google-deepmind/23",
+      "source": "google-deepmind",
+      "lang": "en",
+      "publishedAt": "2026-10-13T09:30:00.000Z",
+      "summary": "Research update: learning world models from video. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-research"],
+      "score": 14,
+      "related": []
+    },
+    {
+      "id": "d2e02c9532582991",
+      "title": "今週読んだ AI 論文まとめ（推論・エージェント）",
+      "url": "https://example.com/mock/zenn/24",
+      "source": "zenn",
+      "lang": "ja",
+      "publishedAt": "2026-10-13T00:00:00.000Z",
+      "summary": "今週読んだ AI 論文まとめ（推論・エージェント）。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-research"],
+      "score": 51,
+      "related": []
+    },
+    {
+      "id": "7df61f6bf51bd955",
+      "title": "AI coding startup raises Series B to expand enterprise sales",
+      "url": "https://example.com/mock/techcrunch-ai/25",
+      "source": "techcrunch-ai",
+      "lang": "en",
+      "publishedAt": "2026-10-12T14:30:00.000Z",
+      "category": "ai",
+      "tags": ["ai-business", "ai-dev"],
+      "score": 118,
+      "related": [
+        {
+          "source": "hacker-news",
+          "url": "https://example.com/mock/hacker-news/related-25-1"
+        },
+        {
+          "source": "itmedia-news",
+          "url": "https://example.com/mock/itmedia-news/related-25-2"
+        }
+      ]
+    },
+    {
+      "id": "9f7199d83a92ad8e",
+      "title": "生成 AI で問い合わせ対応を半減、国内保険会社の導入事例",
+      "url": "https://example.com/mock/itmedia-aiplus/26",
+      "source": "itmedia-aiplus",
+      "lang": "ja",
+      "publishedAt": "2026-10-12T05:00:00.000Z",
+      "summary": "生成 AI で問い合わせ対応を半減、国内保険会社の導入事例。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-business"],
+      "score": 35,
+      "related": []
+    },
+    {
+      "id": "4322621dcf3ff954",
+      "title": "国内 SIer、AI 開発支援ツールを全社展開へ",
+      "url": "https://example.com/mock/publickey/27",
+      "source": "publickey",
+      "lang": "ja",
+      "publishedAt": "2026-10-11T19:30:00.000Z",
+      "summary": "国内 SIer、AI 開発支援ツールを全社展開へ。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-business"],
+      "score": 72,
+      "related": []
+    },
+    {
+      "id": "ed5c3f2ae301f963",
+      "title": "Enterprise AI spending survey shows shift to agents",
+      "url": "https://example.com/mock/the-decoder/28",
+      "source": "the-decoder",
+      "lang": "en",
+      "publishedAt": "2026-10-11T10:00:00.000Z",
+      "summary": "Enterprise AI spending survey shows shift to agents. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-business"],
+      "score": 19,
+      "related": []
+    },
+    {
+      "id": "7752872d0a8614ed",
+      "title": "AI 推進法に基づく指針案、パブリックコメント開始",
+      "url": "https://example.com/mock/itmedia-aiplus/29",
+      "source": "itmedia-aiplus",
+      "lang": "ja",
+      "publishedAt": "2026-10-11T00:30:00.000Z",
+      "summary": "AI 推進法に基づく指針案、パブリックコメント開始。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-policy"],
+      "score": 56,
+      "related": []
+    },
+    {
+      "id": "a97c6ea786216815",
+      "title": "EU AI Act: obligations for general-purpose models take effect",
+      "url": "https://example.com/mock/the-decoder/30",
+      "source": "the-decoder",
+      "lang": "en",
+      "publishedAt": "2026-10-10T15:00:00.000Z",
+      "category": "ai",
+      "tags": ["ai-policy"],
+      "score": 93,
+      "related": []
+    },
+    {
+      "id": "67ca06c39b35d430",
+      "title": "Court ruling addresses copyright in AI training data",
+      "url": "https://example.com/mock/techcrunch-ai/31",
+      "source": "techcrunch-ai",
+      "lang": "en",
+      "publishedAt": "2026-10-10T05:30:00.000Z",
+      "summary": "Court ruling addresses copyright in AI training data. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-policy"],
+      "score": 55,
+      "related": [
+        {
+          "source": "hacker-news",
+          "url": "https://example.com/mock/hacker-news/related-31-1"
+        }
+      ]
+    },
+    {
+      "id": "93b511c8caa9bf23",
+      "title": "生成 AI の業務利用ガイドラインを改訂する際のポイント",
+      "url": "https://example.com/mock/gihyo/32",
+      "source": "gihyo",
+      "lang": "ja",
+      "publishedAt": "2026-10-09T20:00:00.000Z",
+      "summary": "生成 AI の業務利用ガイドラインを改訂する際のポイント。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-policy"],
+      "score": 77,
+      "related": []
+    },
+    {
+      "id": "e07889fe1beebb96",
+      "title": "Prompt injection remains unsolved for tool-using agents",
+      "url": "https://example.com/mock/simon-willison/33",
+      "source": "simon-willison",
+      "lang": "en",
+      "publishedAt": "2026-10-09T10:30:00.000Z",
+      "summary": "Prompt injection remains unsolved for tool-using agents. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-security", "ai-agent"],
+      "score": 24,
+      "related": []
+    },
+    {
+      "id": "fd8c20df829edad1",
+      "title": "AI エージェント経由の情報漏えいに注意、プロンプトインジェクションの手口",
+      "url": "https://example.com/mock/security-next/34",
+      "source": "security-next",
+      "lang": "ja",
+      "publishedAt": "2026-10-09T01:00:00.000Z",
+      "summary": "AI エージェント経由の情報漏えいに注意、プロンプトインジェクションの手口。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "security",
+      "tags": ["ai-security"],
+      "score": 61,
+      "related": []
+    },
+    {
+      "id": "caf953f121e3489f",
+      "title": "Researchers demonstrate model extraction attack against hosted LLM APIs",
+      "url": "https://example.com/mock/the-hacker-news/35",
+      "source": "the-hacker-news",
+      "lang": "en",
+      "publishedAt": "2026-10-08T15:30:00.000Z",
+      "category": "security",
+      "tags": ["ai-security", "sec-vuln"],
+      "score": 98,
+      "related": []
+    },
+    {
+      "id": "e16677e8d9078290",
+      "title": "生成 AI を悪用したフィッシングメールが急増、見分け方は",
+      "url": "https://example.com/mock/itmedia-aiplus/36",
+      "source": "itmedia-aiplus",
+      "lang": "ja",
+      "publishedAt": "2026-10-08T06:00:00.000Z",
+      "summary": "生成 AI を悪用したフィッシングメールが急増、見分け方は。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-security"],
+      "score": 45,
+      "related": []
+    },
+    {
+      "id": "168032278ae4b8e4",
+      "title": "New inference platform doubles throughput for large models",
+      "url": "https://example.com/mock/nvidia-blog/37",
+      "source": "nvidia-blog",
+      "lang": "en",
+      "publishedAt": "2026-10-07T20:30:00.000Z",
+      "summary": "New inference platform doubles throughput for large models. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-infra"],
+      "score": 112,
+      "related": [
+        {
+          "source": "hacker-news",
+          "url": "https://example.com/mock/hacker-news/related-37-1"
+        },
+        {
+          "source": "itmedia-news",
+          "url": "https://example.com/mock/itmedia-news/related-37-2"
+        }
+      ]
+    },
+    {
+      "id": "b3f6cf9254c091d5",
+      "title": "国内に大規模 AI データセンター建設へ、2028年稼働予定",
+      "url": "https://example.com/mock/itmedia-news/38",
+      "source": "itmedia-news",
+      "lang": "ja",
+      "publishedAt": "2026-10-07T11:00:00.000Z",
+      "summary": "国内に大規模 AI データセンター建設へ、2028年稼働予定。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "ai",
+      "tags": ["ai-infra"],
+      "score": 29,
+      "related": []
+    },
+    {
+      "id": "5a8edd8811135296",
+      "title": "Running inference at scale: lessons from serving millions of requests",
+      "url": "https://example.com/mock/hacker-news/39",
+      "source": "hacker-news",
+      "lang": "en",
+      "publishedAt": "2026-10-07T01:30:00.000Z",
+      "summary": "Running inference at scale: lessons from serving millions of requests. This is a mock excerpt for development and is not a real article.",
+      "category": "ai",
+      "tags": ["ai-infra"],
+      "score": 66,
+      "related": []
+    },
+    {
+      "id": "674863a6a1dd5365",
+      "title": "主要クラウド、GPU インスタンスの東京リージョン提供を拡大",
+      "url": "https://example.com/mock/publickey/40",
+      "source": "publickey",
+      "lang": "ja",
+      "publishedAt": "2026-10-06T16:00:00.000Z",
+      "category": "ai",
+      "tags": ["ai-infra"],
+      "score": 13,
+      "related": []
+    },
+    {
+      "id": "a3e6d7c6582c6e0a",
+      "title": "CISA adds three known exploited vulnerabilities to catalog",
+      "url": "https://example.com/mock/cisa-kev/41",
+      "source": "cisa-kev",
+      "lang": "en",
+      "publishedAt": "2026-10-06T06:30:00.000Z",
+      "summary": "CISA adds three known exploited vulnerabilities to catalog. This is a mock excerpt for development and is not a real article.",
+      "category": "security",
+      "tags": ["sec-vuln"],
+      "score": 50,
+      "related": []
+    },
+    {
+      "id": "348b282198a54f2d",
+      "title": "Apache 製品の脆弱性（CVE-2026-41234）に関する注意喚起",
+      "url": "https://example.com/mock/jpcert/42",
+      "source": "jpcert",
+      "lang": "ja",
+      "publishedAt": "2026-10-05T21:00:00.000Z",
+      "summary": "Apache 製品の脆弱性（CVE-2026-41234）に関する注意喚起。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "security",
+      "tags": ["sec-vuln", "sec-advisory"],
+      "score": 87,
+      "related": []
+    },
+    {
+      "id": "1797a627dc9b17d5",
+      "title": "Critical RCE flaw in popular VPN appliance actively exploited",
+      "url": "https://example.com/mock/bleepingcomputer/43",
+      "source": "bleepingcomputer",
+      "lang": "en",
+      "publishedAt": "2026-10-05T11:30:00.000Z",
+      "summary": "Critical RCE flaw in popular VPN appliance actively exploited. This is a mock excerpt for development and is not a real article.",
+      "category": "security",
+      "tags": ["sec-vuln"],
+      "score": 49,
+      "related": [
+        {
+          "source": "hacker-news",
+          "url": "https://example.com/mock/hacker-news/related-43-1"
+        }
+      ]
+    },
+    {
+      "id": "ac82d7e6caa4163f",
+      "title": "Security update guide: October 2026 security updates",
+      "url": "https://example.com/mock/microsoft-msrc/44",
+      "source": "microsoft-msrc",
+      "lang": "en",
+      "publishedAt": "2026-10-05T02:00:00.000Z",
+      "summary": "Security update guide: October 2026 security updates. This is a mock excerpt for development and is not a real article.",
+      "category": "security",
+      "tags": ["sec-vuln"],
+      "score": 71,
+      "related": []
+    },
+    {
+      "id": "041b00a511f68eb7",
+      "title": "不正アクセスによる個人情報漏えいについてまとめてみた",
+      "url": "https://example.com/mock/piyolog/45",
+      "source": "piyolog",
+      "lang": "ja",
+      "publishedAt": "2026-10-04T16:30:00.000Z",
+      "category": "security",
+      "tags": ["sec-incident"],
+      "score": 18,
+      "related": []
+    },
+    {
+      "id": "ee4572534933356a",
+      "title": "委託先への不正アクセスで顧客情報が流出した可能性",
+      "url": "https://example.com/mock/security-next/46",
+      "source": "security-next",
+      "lang": "ja",
+      "publishedAt": "2026-10-04T07:00:00.000Z",
+      "summary": "委託先への不正アクセスで顧客情報が流出した可能性。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "security",
+      "tags": ["sec-incident"],
+      "score": 55,
+      "related": []
+    },
+    {
+      "id": "42cd5f3fdc037179",
+      "title": "Data broker breach exposes millions of records",
+      "url": "https://example.com/mock/krebs-on-security/47",
+      "source": "krebs-on-security",
+      "lang": "en",
+      "publishedAt": "2026-10-03T21:30:00.000Z",
+      "summary": "Data broker breach exposes millions of records. This is a mock excerpt for development and is not a real article.",
+      "category": "security",
+      "tags": ["sec-incident"],
+      "score": 92,
+      "related": []
+    },
+    {
+      "id": "96e4524a1b858126",
+      "title": "Retail chain confirms customer data stolen in cyberattack",
+      "url": "https://example.com/mock/bleepingcomputer/48",
+      "source": "bleepingcomputer",
+      "lang": "en",
+      "publishedAt": "2026-10-03T12:00:00.000Z",
+      "summary": "Retail chain confirms customer data stolen in cyberattack. This is a mock excerpt for development and is not a real article.",
+      "category": "security",
+      "tags": ["sec-incident"],
+      "score": 39,
+      "related": []
+    },
+    {
+      "id": "63d2ea60aca341a8",
+      "title": "New infostealer campaign targets developers via fake packages",
+      "url": "https://example.com/mock/unit42/49",
+      "source": "unit42",
+      "lang": "en",
+      "publishedAt": "2026-10-03T02:30:00.000Z",
+      "summary": "New infostealer campaign targets developers via fake packages. This is a mock excerpt for development and is not a real article.",
+      "category": "security",
+      "tags": ["sec-malware"],
+      "score": 106,
+      "related": [
+        {
+          "source": "hacker-news",
+          "url": "https://example.com/mock/hacker-news/related-49-1"
+        },
+        {
+          "source": "itmedia-news",
+          "url": "https://example.com/mock/itmedia-news/related-49-2"
+        }
+      ]
+    },
+    {
+      "id": "20fb47f893c621a7",
+      "title": "Ransomware group shifts tactics to target virtualization hosts",
+      "url": "https://example.com/mock/the-hacker-news/50",
+      "source": "the-hacker-news",
+      "lang": "en",
+      "publishedAt": "2026-10-02T17:00:00.000Z",
+      "category": "security",
+      "tags": ["sec-malware"],
+      "score": 23,
+      "related": []
+    },
+    {
+      "id": "1200725abf19a969",
+      "title": "ランサムウェア被害の報告件数、前年同期比で増加",
+      "url": "https://example.com/mock/security-next/51",
+      "source": "security-next",
+      "lang": "ja",
+      "publishedAt": "2026-10-02T07:30:00.000Z",
+      "summary": "ランサムウェア被害の報告件数、前年同期比で増加。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "security",
+      "tags": ["sec-malware"],
+      "score": 60,
+      "related": []
+    },
+    {
+      "id": "e373222a4c930cdf",
+      "title": "国内企業のランサムウェア被害事例の整理",
+      "url": "https://example.com/mock/piyolog/52",
+      "source": "piyolog",
+      "lang": "ja",
+      "publishedAt": "2026-10-01T22:00:00.000Z",
+      "summary": "国内企業のランサムウェア被害事例の整理。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "security",
+      "tags": ["sec-malware", "sec-incident"],
+      "score": 97,
+      "related": []
+    },
+    {
+      "id": "c2ea79073e8b4d85",
+      "title": "長期休暇に向けたセキュリティ対策のお願い",
+      "url": "https://example.com/mock/jpcert/53",
+      "source": "jpcert",
+      "lang": "ja",
+      "publishedAt": "2026-10-01T12:30:00.000Z",
+      "summary": "長期休暇に向けたセキュリティ対策のお願い。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "security",
+      "tags": ["sec-advisory"],
+      "score": 44,
+      "related": []
+    },
+    {
+      "id": "29afeeefe22e1803",
+      "title": "情報セキュリティ安心相談窓口の相談状況（2026年第3四半期）",
+      "url": "https://example.com/mock/ipa/54",
+      "source": "ipa",
+      "lang": "ja",
+      "publishedAt": "2026-10-01T03:00:00.000Z",
+      "summary": "情報セキュリティ安心相談窓口の相談状況（2026年第3四半期）。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "security",
+      "tags": ["sec-advisory"],
+      "score": 81,
+      "related": []
+    },
+    {
+      "id": "54bf8f3a8be0c00b",
+      "title": "CISA releases advisory on industrial control system vulnerabilities",
+      "url": "https://example.com/mock/cisa-kev/55",
+      "source": "cisa-kev",
+      "lang": "en",
+      "publishedAt": "2026-09-30T17:30:00.000Z",
+      "category": "security",
+      "tags": ["sec-advisory", "sec-vuln"],
+      "score": 43,
+      "related": [
+        {
+          "source": "hacker-news",
+          "url": "https://example.com/mock/hacker-news/related-55-1"
+        }
+      ]
+    },
+    {
+      "id": "3f1abde6fdc084f1",
+      "title": "更新：Microsoft 製品の脆弱性対策について",
+      "url": "https://example.com/mock/ipa/56",
+      "source": "ipa",
+      "lang": "ja",
+      "publishedAt": "2026-09-30T08:00:00.000Z",
+      "summary": "更新：Microsoft 製品の脆弱性対策について。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "security",
+      "tags": ["sec-advisory", "sec-vuln"],
+      "score": 65,
+      "related": []
+    },
+    {
+      "id": "7c2619bd338c12bd",
+      "title": "Misconfigured cloud storage buckets leak API keys",
+      "url": "https://example.com/mock/the-hacker-news/57",
+      "source": "the-hacker-news",
+      "lang": "en",
+      "publishedAt": "2026-09-29T22:30:00.000Z",
+      "summary": "Misconfigured cloud storage buckets leak API keys. This is a mock excerpt for development and is not a real article.",
+      "category": "security",
+      "tags": ["sec-cloud", "sec-incident"],
+      "score": 12,
+      "related": []
+    },
+    {
+      "id": "e316a9a7ff1da144",
+      "title": "Guidance on mitigating token theft in Entra ID",
+      "url": "https://example.com/mock/microsoft-msrc/58",
+      "source": "microsoft-msrc",
+      "lang": "en",
+      "publishedAt": "2026-09-29T13:00:00.000Z",
+      "summary": "Guidance on mitigating token theft in Entra ID. This is a mock excerpt for development and is not a real article.",
+      "category": "security",
+      "tags": ["sec-cloud"],
+      "score": 49,
+      "related": []
+    },
+    {
+      "id": "ab0041e91ff9ec1a",
+      "title": "クラウドの ID 管理の不備を狙う攻撃に注意",
+      "url": "https://example.com/mock/security-next/59",
+      "source": "security-next",
+      "lang": "ja",
+      "publishedAt": "2026-09-29T03:30:00.000Z",
+      "summary": "クラウドの ID 管理の不備を狙う攻撃に注意。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "security",
+      "tags": ["sec-cloud"],
+      "score": 86,
+      "related": []
+    },
+    {
+      "id": "9c141a48182fbbbc",
+      "title": "MFA fatigue attacks continue to hit SaaS accounts",
+      "url": "https://example.com/mock/krebs-on-security/60",
+      "source": "krebs-on-security",
+      "lang": "en",
+      "publishedAt": "2026-09-28T18:00:00.000Z",
+      "category": "security",
+      "tags": ["sec-cloud"],
+      "score": 33,
+      "related": []
+    },
+    {
+      "id": "99e2381987333b69",
+      "title": "主要ブラウザ、新しい Web 標準 API の実装を発表",
+      "url": "https://example.com/mock/publickey/61",
+      "source": "publickey",
+      "lang": "ja",
+      "publishedAt": "2026-09-28T08:30:00.000Z",
+      "summary": "主要ブラウザ、新しい Web 標準 API の実装を発表。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "general",
+      "tags": [],
+      "score": 100,
+      "related": [
+        {
+          "source": "hacker-news",
+          "url": "https://example.com/mock/hacker-news/related-61-1"
+        },
+        {
+          "source": "itmedia-news",
+          "url": "https://example.com/mock/itmedia-news/related-61-2"
+        }
+      ]
+    },
+    {
+      "id": "2964f417e5d670ac",
+      "title": "Show HN: A tiny static site generator written in Go",
+      "url": "https://example.com/mock/hacker-news/62",
+      "source": "hacker-news",
+      "lang": "en",
+      "publishedAt": "2026-09-27T23:00:00.000Z",
+      "summary": "Show HN: A tiny static site generator written in Go. This is a mock excerpt for development and is not a real article.",
+      "category": "general",
+      "tags": [],
+      "score": 17,
+      "related": []
+    },
+    {
+      "id": "d232153aabb72a40",
+      "title": "エンジニアのための技術記事の書き方",
+      "url": "https://example.com/mock/hatena-it/63",
+      "source": "hatena-it",
+      "lang": "ja",
+      "publishedAt": "2026-09-27T13:30:00.000Z",
+      "summary": "エンジニアのための技術記事の書き方。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "general",
+      "tags": [],
+      "score": 54,
+      "related": []
+    },
+    {
+      "id": "94af62f84012223e",
+      "title": "国内スマートフォン出荷台数、上期は前年並み",
+      "url": "https://example.com/mock/itmedia-news/64",
+      "source": "itmedia-news",
+      "lang": "ja",
+      "publishedAt": "2026-09-27T04:00:00.000Z",
+      "summary": "国内スマートフォン出荷台数、上期は前年並み。これは開発用のモック記事の抜粋で、実在の記事ではありません。",
+      "category": "general",
+      "tags": [],
+      "score": 91,
+      "related": []
+    }
+  ]
+}

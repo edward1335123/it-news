@@ -78,7 +78,15 @@ iPhone（PWA）: JSON を取得して表示。既読・お気に入り・設定�
 `expo`（大型展示会） / `conference`（企業カンファレンス） / `meetup`（勉強会・ミートアップ）
 開催形式: `offline`（東京） / `online` / `hybrid`
 
-## 5. データ形式（案。フェーズ1で確定）
+## 5. データ形式
+
+フェーズ1で確定。正は `shared/src/schemas.ts`（zod スキーマ。型は `z.infer` で導出する）。
+
+- `news.json`: `{ generatedAt: string; articles: Article[] }`
+- `events.json`: `{ generatedAt: string; events: Event[] }`
+- `sources.json`: `{ sources: Source[] }`
+- URL は http/https のみ、日時はタイムゾーン付きの ISO 8601、`summary` は200字以内、`tags` は 4.1/4.2 の ID（重複不可）、ID は各ファイル内で一意
+
 
 ```ts
 type Article = {
