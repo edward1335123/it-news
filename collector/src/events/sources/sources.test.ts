@@ -197,6 +197,14 @@ describe('techplay', () => {
     ]);
   });
 
+  it('リンクの文字参照を戻す', () => {
+    const withQuery = rss.replace(
+      'https://techplay.jp/event/1001997<',
+      'https://techplay.jp/event/1001997?a=1&amp;b=2<',
+    );
+    expect(parseTechplayFeed(withQuery)[0]?.url).toBe('https://techplay.jp/event/1001997?a=1&b=2');
+  });
+
   it('RSS でなければ例外を投げる', () => {
     expect(() => parseTechplayFeed('<html><body>error</body></html>')).toThrow();
   });

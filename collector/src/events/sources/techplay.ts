@@ -1,4 +1,5 @@
 import { XMLParser } from 'fast-xml-parser';
+import { decodeEntities } from '../../news/text';
 import type { EventCandidate } from '../build';
 import type { GetText, SourceResult } from './types';
 
@@ -48,7 +49,7 @@ export function parseTechplayFeed(xml: string): EventCandidate[] {
   const candidates: EventCandidate[] = [];
   for (const item of items) {
     if (!isNode(item)) continue;
-    const url = text(item.link);
+    const url = decodeEntities(text(item.link));
     const id = /\/event\/(\d+)/.exec(url)?.[1];
     const startAt = optional(item['tp:eventStartTime']);
     if (id === undefined || startAt === undefined) continue;

@@ -21,9 +21,21 @@ const API_INTERVAL_MS = 1_100;
 const EVENTS_PATH = join(DATA_DIR, 'events.json');
 const MANUAL_PATH = resolve(import.meta.dirname, '../../../data/manual-events.json');
 
+/** JSON ファイルを読む。ファイルがなければ undefined、JSON として壊れていれば警告して null */
+async function readJsonOrWarn(path: string, label: string): Promise<unknown> {
+  try {
+    return await readJson(path);
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) throw error;
+    log.warn(`[events] ${label} が JSON として正しくないため使わない: ${error.message}`);
+    return null;
+  }
+}
+
 /** 前回の events.json。なければ空、形式が違えば警告して空にする */
 async function readPrevious(): Promise<TechEvent[]> {
-  const json = await readJson(EVENTS_PATH);
+  const json = await readJsonOrWarn(EVENTS_PATH, '前回の events.json');
+  if (json === null) return [];
   if (json === undefined) return [];
   const parsed = eventsFileSchema.safeParse(json);
   if (parsed.success) return parsed.data.events;
@@ -32,7 +44,8 @@ async function readPrevious(): Promise<TechEvent[]> {
 }
 
 async function readManual(): Promise<TechEvent[]> {
-  const json = await readJson(MANUAL_PATH);
+  const json = await readJsonOrWarn(MANUAL_PATH, 'data/manual-events.json');
+  if (json === null) return [];
   if (json === undefined) {
     log.warn('[events] data/manual-events.json がない');
     return [];

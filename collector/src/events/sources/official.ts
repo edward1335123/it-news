@@ -131,7 +131,9 @@ export function toCandidate(site: OfficialSite, node: JsonObject): EventCandidat
   const location = ([] as unknown[]).concat(node.location).find(isObject);
   const place = placeSchema.safeParse(location ?? {}).data ?? {};
   const venue = str(place.name);
-  const address = addressText(place.address);
+  const fullAddress = addressText(place.address);
+  // 会場名と同じ文字列の住所は二重に表示されるので省く
+  const address = fullAddress === venue ? undefined : fullAddress;
   const title = cleanOfficialTitle(name);
 
   const mode = str(node.eventAttendanceMode) ?? '';
