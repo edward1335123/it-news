@@ -90,8 +90,8 @@ export function createIcs(event: TechEvent, now: Date): string {
     `DTEND:${formatIcsDate(end)}`,
     `SUMMARY:${escapeIcsText(event.title)}`,
     place === undefined ? undefined : `LOCATION:${escapeIcsText(place)}`,
-    // URL は http/https に限っている（shared のスキーマ）
-    `URL:${event.url}`,
+    // URL は http/https に限っている（shared のスキーマ）。空白・制御文字が行に入らないよう正規化する
+    `URL:${new URL(event.url).href}`,
     `DESCRIPTION:${escapeIcsText(description(event))}`,
     'END:VEVENT',
     'END:VCALENDAR',
@@ -107,7 +107,7 @@ export function icsFileName(event: TechEvent): string {
   return `event-${event.id.replace(/[^A-Za-z0-9_-]/g, '_')}.ics`;
 }
 
-/** .ics を生成してダウンロードする（iOS ではカレンダーへの追加画面が開く） */
+/** .ics を生成してダウンロードする（iOS ではカレンダーへの追加画面が開く想定。実機で要確認） */
 export function downloadIcs(event: TechEvent, now: Date = new Date()): void {
   const blob = new Blob([createIcs(event, now)], { type: 'text/calendar;charset=utf-8' });
   const url = URL.createObjectURL(blob);

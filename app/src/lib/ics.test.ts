@@ -137,6 +137,15 @@ describe('createIcs', () => {
     expect(lines).toContain('DESCRIPTION:勉強会 / 東京\\nhttps://example.com/e2');
   });
 
+  it('URL の空白をエンコードし、改行を URL の行に入れない', () => {
+    const url = 'https://example.com/a b\r\nX-INJECT:1';
+    const lines = unfold(createIcs({ ...event, url }, now));
+    expect(lines.filter((l) => l.startsWith('URL:'))).toEqual([
+      'URL:https://example.com/a%20bX-INJECT:1',
+    ]);
+    expect(lines.some((l) => l.startsWith('X-INJECT'))).toBe(false);
+  });
+
   it('オンライン開催の場所は「オンライン」', () => {
     const lines = unfold(createIcs({ ...event, format: 'online' }, now));
     expect(lines).toContain('LOCATION:オンライン');

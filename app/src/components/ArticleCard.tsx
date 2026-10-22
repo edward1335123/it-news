@@ -56,7 +56,10 @@ export function ArticleCard({
           rel="noopener noreferrer"
           lang={article.lang}
           onClick={onOpen}
-          onAuxClick={onOpen}
+          // 中クリックで開いたときだけ既読にする（右クリックのメニューでは既読にしない）
+          onAuxClick={(e) => {
+            if (e.button === 1) onOpen();
+          }}
         >
           {article.title}
         </a>

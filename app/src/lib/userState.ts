@@ -72,8 +72,13 @@ export function pruneRead(read: ReadRecord, now: number): ReadRecord {
   );
 }
 
+/** 既読か。`in` だと `constructor` などのプロトタイプのキーも既読になるので使わない */
+export function hasRead(read: ReadRecord, id: string): boolean {
+  return Object.hasOwn(read, id);
+}
+
 export function markRead(read: ReadRecord, id: string, now: number): ReadRecord {
-  return id in read ? read : { ...read, [id]: now };
+  return hasRead(read, id) ? read : { ...read, [id]: now };
 }
 
 export function isSaved(saved: Saved, list: SavedList, id: string): boolean {
@@ -141,7 +146,7 @@ export function useUserState(): UserState {
   );
   const [saved, setSaved] = usePersistentState('saved', savedSchema, EMPTY_SAVED);
 
-  const isReadFn = useCallback((id: string) => id in read, [read]);
+  const isReadFn = useCallback((id: string) => hasRead(read, id), [read]);
   const markReadFn = useCallback(
     (id: string) => setRead((prev) => markRead(prev, id, Date.now())),
     [setRead],

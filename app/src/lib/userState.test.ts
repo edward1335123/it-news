@@ -6,6 +6,7 @@ import {
   MUTED_WORD_MAX_LENGTH,
   READ_RETENTION_MS,
   addMutedWord,
+  hasRead,
   isSaved,
   markRead,
   prefsSchema,
@@ -57,6 +58,12 @@ describe('既読', () => {
     const read = markRead({}, 'a', 100);
     expect(read).toEqual({ a: 100 });
     expect(markRead(read, 'a', 200)).toBe(read);
+  });
+
+  it('プロトタイプのキーを既読と判定しない', () => {
+    expect(hasRead({}, 'constructor')).toBe(false);
+    expect(hasRead({}, 'toString')).toBe(false);
+    expect(markRead({}, 'constructor', 100)).toEqual({ constructor: 100 });
   });
 
   it('保持期間を過ぎた記録を削除する', () => {
