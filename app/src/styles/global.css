@@ -240,7 +240,8 @@ a {
 /* スクロール中もヘッダーの下に固定する。左右は画面の端まで背景を広げる */
 .day__heading {
   position: sticky;
-  top: var(--header-height);
+  /* ヘッダーの下の枠線 1px の分も下げる */
+  top: calc(var(--header-height) + 1px);
   z-index: 5;
   display: flex;
   align-items: baseline;

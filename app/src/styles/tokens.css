@@ -58,7 +58,7 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
 
-  /* ヘッダーの高さ。日付の見出しをこの下に固定する */
+  /* ヘッダーの高さ（下の枠線 1px を除く）。日付の見出しをこの下に固定する */
   --header-height: calc(var(--tap-size) + var(--space-2) + var(--safe-top));
 }
 

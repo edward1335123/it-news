@@ -210,6 +210,26 @@ describe('groupArticlesByDay', () => {
   it('記事がなければ区切りもない', () => {
     expect(groupArticlesByDay([], now)).toEqual([]);
   });
+
+  it('now より後の日付の記事は今日にまとめる（0:00 をまたいで再取得したとき）', () => {
+    const beforeMidnight = new Date('2026-10-23T23:50:00+09:00');
+    const list = [
+      article('a', [], '2026-10-24T00:05:00+09:00'),
+      article('b', [], '2026-10-23T23:00:00+09:00'),
+      article('c', [], '2026-10-22T23:00:00+09:00'),
+    ];
+    expect(
+      groupArticlesByDay(list, beforeMidnight).map((g) => [
+        g.key,
+        g.label,
+        g.today,
+        ids(g.articles),
+      ]),
+    ).toEqual([
+      ['2026-10-23', '今日', true, ['a', 'b']],
+      ['2026-10-22', '昨日', false, ['c']],
+    ]);
+  });
 });
 
 describe('eventEndTime', () => {

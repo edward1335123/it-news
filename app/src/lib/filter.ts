@@ -105,17 +105,22 @@ export type DayGroup = {
   articles: Article[];
 };
 
-/** 記事を公開日（東京時間）ごとに分ける。日付・記事の順番は渡した順のまま */
+/**
+ * 記事を公開日（東京時間）ごとに分ける。日付・記事の順番は渡した順のまま。
+ * `now` より後の日付の記事（0:00 をまたいで再取得したときや、端末の時計の遅れ）は今日にまとめる。
+ */
 export function groupArticlesByDay(articles: readonly Article[], now: Date): DayGroup[] {
   const groups = new Map<string, DayGroup>();
   const todayKey = tokyoDateKey(now.toISOString());
   for (const article of articles) {
-    const key = tokyoDateKey(article.publishedAt);
+    const articleKey = tokyoDateKey(article.publishedAt);
+    // キーは 2026-10-22 の形式なので、文字列の比較で日付の前後が分かる
+    const key = articleKey > todayKey ? todayKey : articleKey;
     const group = groups.get(key);
     if (group === undefined) {
       groups.set(key, {
         key,
-        label: formatDayLabel(article.publishedAt, now),
+        label: key === todayKey ? '今日' : formatDayLabel(article.publishedAt, now),
         today: key === todayKey,
         articles: [article],
       });
