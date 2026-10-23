@@ -97,7 +97,7 @@
 
 ## フェーズ7: 自動化と公開
 **作業**
-- GitHub Actions: 毎時の収集 → ビルド → Cloudflare Pages へのデプロイ
+- GitHub Actions: 3時間ごとの収集 → ビルド → Cloudflare Pages へのデプロイ（当初は毎時。2026-10-23 に変更）
 - Cloudflare Access でメールOTP認証を設定する（手順を `docs/DEPLOY.md` に書く）
 - Secrets の一覧と設定手順をまとめる
 

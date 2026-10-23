@@ -10,13 +10,13 @@ ITエンジニア（東京在住）が、AI・セキュリティのニュース�
 | 利用者 | 本人のみ（Cloudflare Access で認証） |
 | AI要約・翻訳 | なし。英語記事は原題のまま表示 |
 | 情報源の言語 | 日本語＋英語（表示は「日本語のみ」と「日本語＋英語」から選べる。3.1） |
-| 更新頻度 | 1時間ごと |
+| 更新頻度 | 3時間ごと（2026-10-23 に1時間ごとから変更。GitHub Actions の無料枠に収めるため） |
 | 費用 | 無料枠のみで運用 |
 
 ## 2. アーキテクチャ
 
 ```
-GitHub Actions（cron: 毎時）
+GitHub Actions（cron: 3時間ごと）
   ├─ collector: RSS/API を取得 → 正規化 → 重複除去 → 分類・タグ付け → data/news.json
   ├─ collector: イベントを取得 → 東京＋オンラインで絞り込み → data/events.json
   └─ notifier: 通知条件に一致した新着を Web Push で送信

@@ -1,11 +1,11 @@
 # デプロイ手順
 
-GitHub Actions で毎時ニュースとイベントを収集し、ビルドして Cloudflare Pages に置く。
+GitHub Actions で3時間ごとにニュースとイベントを収集し、ビルドして Cloudflare Pages に置く。
 サイトは Cloudflare Access で守り、登録したメールアドレスにワンタイムPIN（メールOTP）を送ってログインする。
 
 ```
 GitHub Actions（.github/workflows/deploy.yml）
-  push（main）・毎時17分・手動 → 収集 → ビルド → wrangler pages deploy
+  push（main）・3時間ごと・手動 → 収集 → ビルド → wrangler pages deploy
         ↓
 Cloudflare Pages（<project>.pages.dev）← Cloudflare Access（メールOTP）
 ```
@@ -15,7 +15,7 @@ Cloudflare Pages（<project>.pages.dev）← Cloudflare Access（メールOTP）
 | きっかけ | 内容 |
 |---|---|
 | `main` への push | `npm run check` → 収集 → ビルド → デプロイ |
-| 毎時17分（cron） | push と同じ（push の実行が失敗・取り消しになったコミットを検証せずに出さないため、毎回 `npm run check` を通す） |
+| 3時間ごと（cron。日本時間 0・3・6・9・12・15・18・21時の17分） | push と同じ（push の実行が失敗・取り消しになったコミットを検証せずに出さないため、毎回 `npm run check` を通す） |
 | 手動（Actions 画面の「Run workflow」） | push と同じ |
 
 - `news.json`・`events.json` は git に含めない。前回の実行で保存したものを Actions のキャッシュから戻し、収集で追記してから、次回のために保存し直す
@@ -81,8 +81,9 @@ wrangler の版は `.github/workflows/deploy.yml` と揃える。
 ### Actions の利用時間について
 
 - 公開（public）リポジトリなら、Actions の利用時間は無料で制限がない
-- 非公開（private）リポジトリは、無料プランで月2,000分まで。毎時の実行は月に約720回で、1回あたりの時間は分単位に切り上げて数える。1回3分かかると月2,160分になり、上限を超える
-- 非公開にしたいときは、Actions 画面で1回の時間を確かめ、2分を超えるなら cron の間隔を広げる（例: `'17 */2 * * *'` で2時間ごと）
+- 非公開（private）リポジトリは、無料プランで月2,000分まで。3時間ごとの実行は月に約240回で、1回あたりの時間は分単位に切り上げて数える。1回3分なら月720分、push の実行を足しても上限には十分収まる
+- 超えた場合、支払い方法を登録していなければその月の残りは実行されない（請求はされない）。サイトは最後のデプロイのまま表示され、翌月に再開する
+- 間隔を変えるときは `deploy.yml` の cron を書き換える（例: `'17 */2 * * *'` で2時間ごと、`'17 * * * *'` で毎時）。毎時にすると1回3分で月2,160分になり、非公開では上限を超える
 - リポジトリには秘密情報を含めていない（すべて Secrets に置く）ので、公開しても中身から漏れるものはない。収集したデータ（news.json・events.json）もリポジトリには入らない
 - ただし公開リポジトリでは、Actions の実行履歴とログも誰でも見られる。ログにはデプロイごとの URL（Access で守られている）や、情報源ごとの取得エラーが出る。API キーはログに出さない
 

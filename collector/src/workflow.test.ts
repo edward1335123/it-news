@@ -17,9 +17,9 @@ const indexOf = (label: string) => {
 };
 
 describe('deploy.yml', () => {
-  it('main への push と毎時の cron の両方で動く', () => {
+  it('main への push と3時間ごとの cron の両方で動く', () => {
     expect(workflow).toMatch(/^ {2}push:\n {4}branches: \[main\]$/m);
-    expect(workflow).toMatch(/^ {4}- cron: '\d{1,2} \* \* \* \*'$/m);
+    expect(workflow).toMatch(/^ {4}- cron: '\d{1,2} \*\/3 \* \* \*'$/m);
   });
 
   it('前回のデータを戻す → 収集 → 保存 → ビルド → デプロイの順に動く', () => {

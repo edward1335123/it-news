@@ -65,4 +65,4 @@ npm run icons -w app
 
 ## デプロイ
 
-GitHub Actions（`.github/workflows/deploy.yml`）が、`main` への push と毎時の定時実行で、収集 → ビルド → Cloudflare Pages へのデプロイを行う。サイトは Cloudflare Access（メールOTP）で守る。準備の手順と Secrets の一覧は [docs/DEPLOY.md](docs/DEPLOY.md) を参照。
+GitHub Actions（`.github/workflows/deploy.yml`）が、`main` への push と3時間ごとの定時実行で、収集 → ビルド → Cloudflare Pages へのデプロイを行う。サイトは Cloudflare Access（メールOTP）で守る。準備の手順と Secrets の一覧は [docs/DEPLOY.md](docs/DEPLOY.md) を参照。
