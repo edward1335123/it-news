@@ -1,9 +1,8 @@
 import { CATEGORIES } from '@itnews/shared';
 import type { SourcesFile } from '@itnews/shared';
-import { useState } from 'react';
-import { CloseIcon } from '../components/icons';
 import { ErrorView, LoadingView } from '../components/StatusView';
 import { Switch } from '../components/Switch';
+import { WordEditor } from '../components/WordEditor';
 import type { LoadState } from '../lib/useRemoteData';
 import {
   MUTED_WORD_MAX_LENGTH,
@@ -12,6 +11,7 @@ import {
   setSourceEnabled,
 } from '../lib/userState';
 import type { UserState } from '../lib/userState';
+import { NotificationSettings } from './NotificationSettings';
 
 type Props = {
   sources: LoadState<SourcesFile>;
@@ -61,65 +61,24 @@ export function SettingsView({ sources, onRetrySources, user }: Props) {
         <h2 className="settings__heading" id="settings-notification">
           通知
         </h2>
-        <p className="settings__note">通知の設定は準備中です</p>
+        <NotificationSettings user={user} />
       </section>
     </div>
   );
 }
 
 function MutedWords({ user }: { user: UserState }) {
-  const [draft, setDraft] = useState('');
-  const words = user.prefs.mutedWords;
-
-  const submit = () => {
-    if (draft.trim() === '') return;
-    user.updatePrefs((prev) => addMutedWord(prev, draft));
-    setDraft('');
-  };
-
   return (
-    <>
-      <form
-        className="inline-form"
-        onSubmit={(e) => {
-          e.preventDefault();
-          submit();
-        }}
-      >
-        <input
-          type="text"
-          className="text-input"
-          aria-label="ミュートする語"
-          placeholder="例: 求人"
-          value={draft}
-          maxLength={MUTED_WORD_MAX_LENGTH}
-          enterKeyHint="done"
-          onChange={(e) => setDraft(e.target.value)}
-        />
-        <button type="submit" className="button" disabled={draft.trim() === ''}>
-          追加
-        </button>
-      </form>
-      {words.length === 0 ? (
-        <p className="settings__note">ミュート語はありません</p>
-      ) : (
-        <ul className="word-list" aria-label="ミュート語の一覧">
-          {words.map((word) => (
-            <li key={word} className="word-list__item">
-              <span className="word-list__word">{word}</span>
-              <button
-                type="button"
-                className="icon-button"
-                aria-label={`${word} を削除`}
-                onClick={() => user.updatePrefs((prev) => removeMutedWord(prev, word))}
-              >
-                <CloseIcon />
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
-    </>
+    <WordEditor
+      words={user.prefs.mutedWords}
+      onAdd={(word) => user.updatePrefs((prev) => addMutedWord(prev, word))}
+      onRemove={(word) => user.updatePrefs((prev) => removeMutedWord(prev, word))}
+      inputLabel="ミュートする語"
+      listLabel="ミュート語の一覧"
+      placeholder="例: 求人"
+      emptyText="ミュート語はありません"
+      maxLength={MUTED_WORD_MAX_LENGTH}
+    />
   );
 }
 

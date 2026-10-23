@@ -373,7 +373,7 @@ describe('App', () => {
       await user.click(screen.getByRole('button', { name: '設定' }));
       const input = screen.getByRole('textbox', { name: 'ミュートする語' });
       await user.type(input, 'ＣＯＰＩＬＯＴ');
-      await user.click(screen.getByRole('button', { name: '追加' }));
+      await user.click(screen.getByRole('button', { name: 'ミュートする語を追加' }));
       expect(input).toHaveValue('');
       const list = screen.getByRole('list', { name: 'ミュート語の一覧' });
       expect(within(list).getByText('ＣＯＰＩＬＯＴ')).toBeInTheDocument();

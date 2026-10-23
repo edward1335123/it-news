@@ -32,6 +32,9 @@ npm run dev      # 開発サーバを起動（http://localhost:5173）
 | `npm run preview` | ビルド結果をローカルで配信する |
 | `npm run collect:news` | ニュースを収集して `app/public/data/news.json` を作る |
 | `npm run collect:events` | イベントを収集して `app/public/data/events.json` を作る |
+| `npm run notify` | 新着をプッシュ通知で送る（設定は [docs/NOTIFY.md](docs/NOTIFY.md)） |
+| `npm run notify:test` | テスト通知を1件送る |
+| `npm run notify:keys` | プッシュ通知の VAPID 鍵を作って表示する |
 | `npm run lint` | ESLint と Prettier のチェック |
 | `npm run format` | Prettier で整形する |
 | `npm run typecheck` | 全ワークスペースの型チェック |

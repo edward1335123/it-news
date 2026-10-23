@@ -78,7 +78,10 @@ jobs:
             app/public/data/events.json
           key: data-${{ github.run_id }}-${{ github.run_attempt }}
 
+      # VAPID 公開鍵は公開してよい値なので、Variable からアプリに埋め込む
       - run: npm run build
+        env:
+          VITE_VAPID_PUBLIC_KEY: ${{ vars.VAPID_PUBLIC_KEY }}
 
       # --branch=main で本番（Production）のデプロイになる。
       # API トークンを渡すので、wrangler は版を固定する（上げるときは DEPLOY.md の版も揃える）
@@ -90,3 +93,28 @@ jobs:
         run: |
           test -n "$PROJECT" || { echo "::error::Variables に CLOUDFLARE_PAGES_PROJECT がない"; exit 1; }
           npx --yes wrangler@4.152.0 pages deploy app/dist --project-name="$PROJECT" --branch=main --commit-dirty=true
+
+      # 送信済みの記録（collector/.state）を戻す。データとは別のキャッシュにする
+      - name: 送信済みの記録を戻す
+        uses: actions/cache/restore@v4
+        with:
+          path: collector/.state
+          key: notify-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: notify-
+
+      # 鍵や購読情報が未登録なら何もしない。送信に失敗してもデプロイ済みなので、警告に留める
+      - name: 新着を通知する
+        env:
+          VAPID_PUBLIC_KEY: ${{ vars.VAPID_PUBLIC_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+          VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+          PUSH_CONFIG: ${{ secrets.PUSH_CONFIG }}
+        run: npm run notify || echo "::warning::通知の送信に失敗した。ログの [notify] を見る"
+
+      # 送れた分だけ記録されているので、失敗したときも保存する
+      - name: 送信済みの記録を保存する
+        if: ${{ !cancelled() && hashFiles('collector/.state/notify-state.json') != '' }}
+        uses: actions/cache/save@v4
+        with:
+          path: collector/.state
+          key: notify-${{ github.run_id }}-${{ github.run_attempt }}

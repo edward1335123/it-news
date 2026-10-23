@@ -717,6 +717,69 @@ a {
   overflow-wrap: anywhere;
 }
 
+.settings__subheading {
+  margin-top: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+}
+
+.settings__error {
+  color: var(--color-hot);
+  font-size: var(--font-size-sm);
+}
+
+.switch__input:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ---- 通知 ---- */
+
+.hour-range {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.hour-select {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.select {
+  min-height: var(--tap-size);
+  padding: 0 var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  /* 16px 未満だと iOS が選択時にズームする */
+  font-size: 1rem;
+}
+
+.select:disabled {
+  opacity: 0.5;
+}
+
+.config-output {
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1rem;
+  word-break: break-all;
+  resize: vertical;
+}
+
 @keyframes spin {
   to {
     transform: rotate(360deg);

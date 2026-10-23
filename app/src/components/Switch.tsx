@@ -7,10 +7,11 @@ type Props = {
   children: ReactNode;
   /** ラベルの下に出す補足 */
   description?: string | undefined;
+  disabled?: boolean | undefined;
 };
 
 /** ON/OFF の切り替え。行全体をタップ領域にする */
-export function Switch({ checked, onChange, children, description }: Props) {
+export function Switch({ checked, onChange, children, description, disabled }: Props) {
   const id = useId();
   return (
     <label className="switch">
@@ -29,6 +30,7 @@ export function Switch({ checked, onChange, children, description }: Props) {
         role="switch"
         className="switch__input"
         checked={checked}
+        disabled={disabled}
         aria-labelledby={`${id}-label`}
         aria-describedby={description === undefined ? undefined : `${id}-description`}
         onChange={(e) => onChange(e.target.checked)}

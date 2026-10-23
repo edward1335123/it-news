@@ -45,6 +45,8 @@ export const pwaOptions = {
     // Cloudflare Access のログイン・ログアウトの URL は index.html で返さない
     navigateFallbackDenylist: [/^\/cdn-cgi\//],
     cleanupOutdatedCaches: true,
+    // プッシュ通知の受信と、タップしたときの処理（public/push-sw.js）
+    importScripts: ['push-sw.js'],
     // 新しい SW をすぐ有効にし、初回訪問のページも制御する（data/*.json をキャッシュするため）
     skipWaiting: true,
     clientsClaim: true,

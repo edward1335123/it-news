@@ -1,3 +1,4 @@
+import { NOTIFY_KEYWORD_MAX_COUNT, NOTIFY_KEYWORD_MAX_LENGTH } from '@itnews/shared';
 import type { Article } from '@itnews/shared';
 import { describe, expect, it } from 'vitest';
 import {
@@ -6,6 +7,7 @@ import {
   MUTED_WORD_MAX_LENGTH,
   READ_RETENTION_MS,
   addMutedWord,
+  addNotifyKeyword,
   hasRead,
   isSaved,
   markRead,
@@ -13,6 +15,7 @@ import {
   pruneRead,
   readSchema,
   removeMutedWord,
+  removeNotifyKeyword,
   savedSchema,
   setSourceEnabled,
   toggleSaved,
@@ -35,8 +38,20 @@ describe('保存する値のスキーマ', () => {
   it('設定の項目が壊れていれば、その項目だけ既定値にする', () => {
     expect(
       prefsSchema.parse({ unreadOnly: 'yes', mutedWords: ['求人', 1], disabledSources: ['zenn'] }),
-    ).toEqual({ unreadOnly: false, mutedWords: ['求人'], disabledSources: ['zenn'] });
+    ).toEqual({ ...DEFAULT_PREFS, mutedWords: ['求人'], disabledSources: ['zenn'] });
     expect(prefsSchema.parse({})).toEqual(DEFAULT_PREFS);
+  });
+
+  it('通知の設定: 静かな時間帯は null（使わない）を保ち、壊れていれば既定値にする', () => {
+    expect(prefsSchema.parse({ quietHours: null }).quietHours).toBeNull();
+    expect(prefsSchema.parse({ quietHours: { start: 1, end: 6 } }).quietHours).toEqual({
+      start: 1,
+      end: 6,
+    });
+    expect(prefsSchema.parse({ quietHours: { start: 3, end: 3 } }).quietHours).toEqual(
+      DEFAULT_PREFS.quietHours,
+    );
+    expect(prefsSchema.parse({ notifyKeywords: ['MCP', 2] }).notifyKeywords).toEqual(['MCP']);
   });
 
   it('既読の記録から数値でない値を捨てる', () => {
@@ -97,6 +112,22 @@ describe('ミュート語', () => {
     expect(addMutedWord(prefs, '   ')).toBe(prefs);
     expect(addMutedWord(prefs, 'あ'.repeat(MUTED_WORD_MAX_LENGTH + 1))).toBe(prefs);
     expect(removeMutedWord(prefs, '求人').mutedWords).toEqual(['PR']);
+  });
+});
+
+describe('注目キーワード', () => {
+  it('ミュート語と同じ規則で追加・削除し、上限の数を超えて追加しない', () => {
+    let prefs = addNotifyKeyword(DEFAULT_PREFS, ' Claude Code ');
+    prefs = addNotifyKeyword(prefs, 'ｃｌａｕｄｅ ｃｏｄｅ');
+    expect(prefs.notifyKeywords).toEqual(['Claude Code']);
+    expect(addNotifyKeyword(prefs, 'あ'.repeat(NOTIFY_KEYWORD_MAX_LENGTH + 1))).toBe(prefs);
+    expect(removeNotifyKeyword(prefs, 'Claude Code').notifyKeywords).toEqual([]);
+
+    const full = {
+      ...DEFAULT_PREFS,
+      notifyKeywords: Array.from({ length: NOTIFY_KEYWORD_MAX_COUNT }, (_, i) => `k${i}`),
+    };
+    expect(addNotifyKeyword(full, 'new')).toBe(full);
   });
 });
 

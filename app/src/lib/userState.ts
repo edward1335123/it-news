@@ -1,4 +1,10 @@
-import { articleSchema } from '@itnews/shared';
+import {
+  DEFAULT_QUIET_HOURS,
+  NOTIFY_KEYWORD_MAX_COUNT,
+  NOTIFY_KEYWORD_MAX_LENGTH,
+  articleSchema,
+  quietHoursSchema,
+} from '@itnews/shared';
 import type { Article } from '@itnews/shared';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
@@ -30,10 +36,20 @@ export const prefsSchema = z.object({
   mutedWords: lenientArray(z.string()).catch([]),
   /** OFF にした情報源の ID */
   disabledSources: lenientArray(z.string()).catch([]),
+  /** 通知する注目キーワード（notifier に渡す。SPEC 8章） */
+  notifyKeywords: lenientArray(z.string()).catch([]),
+  /** 通知しない時間帯（日本時間）。null なら設けない */
+  quietHours: quietHoursSchema.nullable().catch(DEFAULT_QUIET_HOURS),
 });
 export type Prefs = z.infer<typeof prefsSchema>;
 
-export const DEFAULT_PREFS: Prefs = { unreadOnly: false, mutedWords: [], disabledSources: [] };
+export const DEFAULT_PREFS: Prefs = {
+  unreadOnly: false,
+  mutedWords: [],
+  disabledSources: [],
+  notifyKeywords: [],
+  quietHours: DEFAULT_QUIET_HOURS,
+};
 
 /** 記事 ID → 既読にした時刻（epoch ミリ秒） */
 export const readSchema = z.record(z.string(), z.unknown()).transform((record) => {
@@ -94,17 +110,34 @@ export function toggleSaved(saved: Saved, list: SavedList, article: Article, now
   return { ...saved, [list]: next };
 }
 
+/** 語を追加する。空・長すぎる・登録済み（表記ゆれを含む）なら同じ配列を返す */
+function addWord(words: string[], word: string, maxLength: number): string[] {
+  const trimmed = word.trim();
+  if (trimmed === '' || trimmed.length > maxLength) return words;
+  const key = normalizeText(trimmed);
+  if (words.some((w) => normalizeText(w) === key)) return words;
+  return [...words, trimmed];
+}
+
 /** ミュート語を追加する。空・長すぎる・登録済み（表記ゆれを含む）なら変えない */
 export function addMutedWord(prefs: Prefs, word: string): Prefs {
-  const trimmed = word.trim();
-  if (trimmed === '' || trimmed.length > MUTED_WORD_MAX_LENGTH) return prefs;
-  const key = normalizeText(trimmed);
-  if (prefs.mutedWords.some((w) => normalizeText(w) === key)) return prefs;
-  return { ...prefs, mutedWords: [...prefs.mutedWords, trimmed] };
+  const mutedWords = addWord(prefs.mutedWords, word, MUTED_WORD_MAX_LENGTH);
+  return mutedWords === prefs.mutedWords ? prefs : { ...prefs, mutedWords };
 }
 
 export function removeMutedWord(prefs: Prefs, word: string): Prefs {
   return { ...prefs, mutedWords: prefs.mutedWords.filter((w) => w !== word) };
+}
+
+/** 注目キーワードを追加する。空・長すぎる・登録済み・上限の数に達しているなら変えない */
+export function addNotifyKeyword(prefs: Prefs, word: string): Prefs {
+  if (prefs.notifyKeywords.length >= NOTIFY_KEYWORD_MAX_COUNT) return prefs;
+  const notifyKeywords = addWord(prefs.notifyKeywords, word, NOTIFY_KEYWORD_MAX_LENGTH);
+  return notifyKeywords === prefs.notifyKeywords ? prefs : { ...prefs, notifyKeywords };
+}
+
+export function removeNotifyKeyword(prefs: Prefs, word: string): Prefs {
+  return { ...prefs, notifyKeywords: prefs.notifyKeywords.filter((w) => w !== word) };
 }
 
 export function setSourceEnabled(prefs: Prefs, sourceId: string, enabled: boolean): Prefs {

@@ -1,4 +1,4 @@
-import { CATEGORY_TAGS } from '@itnews/shared';
+import { CATEGORY_TAGS, normalizeText } from '@itnews/shared';
 import type { Article, TagId, TechEvent } from '@itnews/shared';
 
 /** サブカテゴリのチップで絞り込むニュースのタブ */
@@ -27,12 +27,8 @@ export function sortArticles(articles: readonly Article[]): Article[] {
   return [...articles].sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
 }
 
-/**
- * 比較用に文字列を正規化する。全角・半角の英数字や大文字・小文字の違いを無視する。
- */
-export function normalizeText(text: string): string {
-  return text.normalize('NFKC').toLowerCase();
-}
+/** 比較用に文字列を正規化する（notifier の注目キーワードと同じ規則にするため shared に置く） */
+export { normalizeText };
 
 /** 記事の検索対象（タイトルと抜粋） */
 function articleText(article: Article): string {

@@ -5,7 +5,7 @@ GitHub Actions で3時間ごとにニュースとイベントを収集し、ビ�
 
 ```
 GitHub Actions（.github/workflows/deploy.yml）
-  push（main）・3時間ごと・手動 → 収集 → ビルド → wrangler pages deploy
+  push（main）・3時間ごと・手動 → 収集 → ビルド → wrangler pages deploy → 新着の通知
         ↓
 Cloudflare Pages（<project>.pages.dev）← Cloudflare Access（メールOTP）
 ```
@@ -20,6 +20,7 @@ Cloudflare Pages（<project>.pages.dev）← Cloudflare Access（メールOTP）
 
 - `news.json`・`events.json` は git に含めない。前回の実行で保存したものを Actions のキャッシュから戻し、収集で追記してから、次回のために保存し直す
 - キャッシュが消えたとき（7日使われない、手動で削除した、など）は空から集め直す。記事は30日分がそろうまで少なくなる
+- デプロイの後に、条件に当てはまる新着をプッシュ通知で送る（[NOTIFY.md](NOTIFY.md)）。通知の Secrets が未登録なら何もしない。通知に失敗してもデプロイは失敗にしない
 - 一部の情報源が失敗してもデプロイは続ける。すべて失敗したときは前回のファイルをそのまま使う。前回のファイルもない（初回で全滅した）ときはデプロイしない
 - 同時に2つは走らせない。実行中のものがあると次は待つ。ただし待てるのは最新の1件だけで、それより前に待っていた実行は取り消される（毎回 `npm run check` を通すので、取り消されても検証していないコードは出ない）
 - GitHub の cron は混雑すると数分〜数十分遅れることがある。また、公開リポジトリでは60日間 push などの動きがないと定時実行が自動で止まるので、そのときは Actions 画面で有効に戻す
@@ -34,8 +35,12 @@ GitHub のリポジトリの **Settings → Secrets and variables → Actions** 
 | Secret | `CLOUDFLARE_ACCOUNT_ID` | 必須 | Cloudflare のアカウント ID（3.3） |
 | Secret | `CONNPASS_API_KEY` | 任意 | connpass API v2 のキー。未登録なら connpass だけ取得しない |
 | Variable | `CLOUDFLARE_PAGES_PROJECT` | 必須 | Cloudflare Pages のプロジェクト名（3.1） |
+| Variable | `VAPID_PUBLIC_KEY` | 任意 | プッシュ通知の VAPID 公開鍵。ビルドでアプリに埋め込む（[NOTIFY.md](NOTIFY.md) 2章） |
+| Secret | `VAPID_PRIVATE_KEY` | 任意 | プッシュ通知の VAPID 秘密鍵（NOTIFY.md 2章） |
+| Secret | `VAPID_SUBJECT` | 任意 | `mailto:自分のメールアドレス`（NOTIFY.md 2章） |
+| Secret | `PUSH_CONFIG` | 任意 | アプリの設定画面でコピーした購読情報・注目キーワード・静かな時間帯（NOTIFY.md 4章） |
 
-フェーズ8（プッシュ通知）で VAPID 鍵と購読情報の Secrets を追加する予定。
+通知の4つがそろっていなければ、通知だけを行わない（デプロイは行う）。テスト送信は手動のワークフロー `notify-test` で行う。
 
 ## 3. Cloudflare Pages の準備
 

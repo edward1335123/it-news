@@ -12,3 +12,6 @@ coverage/
 app/public/data/news.json
 app/public/data/events.json
 app/public/data/*.tmp
+
+# notifier の送信済みの記録（Actions のキャッシュで引き継ぐ）
+collector/.state/

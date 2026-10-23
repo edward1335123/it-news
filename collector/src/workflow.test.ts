@@ -44,9 +44,52 @@ describe('deploy.yml', () => {
   });
 
   it('秘密情報は Secrets から渡し、ファイルに直接書かない', () => {
-    for (const name of ['CLOUDFLARE_API_TOKEN', 'CLOUDFLARE_ACCOUNT_ID', 'CONNPASS_API_KEY']) {
+    for (const name of [
+      'CLOUDFLARE_API_TOKEN',
+      'CLOUDFLARE_ACCOUNT_ID',
+      'CONNPASS_API_KEY',
+      'VAPID_PRIVATE_KEY',
+      'VAPID_SUBJECT',
+      'PUSH_CONFIG',
+    ]) {
       expect(workflow).toContain(`${name}: \${{ secrets.${name} }}`);
     }
     expect(workflow).toMatch(/^permissions:\n {2}contents: read$/m);
+  });
+
+  it('デプロイの後に、送信済みの記録を戻す → 通知 → 記録を保存する', () => {
+    const order = [
+      indexOf('Cloudflare Pages にデプロイ'),
+      indexOf('送信済みの記録を戻す'),
+      indexOf('新着を通知する'),
+      indexOf('送信済みの記録を保存する'),
+    ];
+    expect(order).toEqual([...order].sort((a, b) => a - b));
+    expect(workflow).toContain('path: collector/.state');
+    // 通知に失敗しても実行全体は失敗させない
+    expect(workflow).toMatch(/run: npm run notify \|\| echo "::warning::/);
+  });
+
+  it('VAPID 公開鍵は Variable からビルドに渡す（秘密鍵はアプリに渡さない）', () => {
+    expect(workflow).toMatch(
+      /- run: npm run build\n {8}env:\n {10}VITE_VAPID_PUBLIC_KEY: \$\{\{ vars\.VAPID_PUBLIC_KEY \}\}\n/,
+    );
+    expect(workflow).not.toMatch(/VITE_\w*: \$\{\{ secrets\./);
+  });
+});
+
+describe('notify-test.yml', () => {
+  const test = readFileSync(
+    resolve(import.meta.dirname, '../../.github/workflows/notify-test.yml'),
+    'utf8',
+  );
+
+  it('手動でだけ動き、Secrets からテスト通知を送る', () => {
+    expect(test).toMatch(/^on:\n {2}workflow_dispatch:\n\n/m);
+    expect(test).toContain('run: npm run notify:test');
+    for (const name of ['VAPID_PRIVATE_KEY', 'VAPID_SUBJECT', 'PUSH_CONFIG']) {
+      expect(test).toContain(`${name}: \${{ secrets.${name} }}`);
+    }
+    expect(test).toMatch(/^permissions:\n {2}contents: read$/m);
   });
 });

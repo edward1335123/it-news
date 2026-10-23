@@ -48,5 +48,9 @@ export default tseslint.config(
     files: ['**/*.js'],
     ...tseslint.configs.disableTypeChecked,
   },
+  {
+    files: ['app/public/**/*.js'],
+    languageOptions: { globals: globals.serviceworker },
+  },
   prettier,
 );
