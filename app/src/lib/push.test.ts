@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { base64UrlToBytes, buildNotifyConfig, detectPushSupport } from './push';
+import { base64UrlToBytes, buildNotifyConfig, detectPushSupport, sameKey } from './push';
 
 const IPHONE_UA =
   'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1';
@@ -47,6 +47,16 @@ describe('base64UrlToBytes', () => {
   it('base64url（パディングなし）をバイト列にする', () => {
     expect([...base64UrlToBytes('-_8')]).toEqual([0xfb, 0xff]);
     expect([...base64UrlToBytes('AQID')]).toEqual([1, 2, 3]);
+  });
+});
+
+describe('sameKey', () => {
+  it('バイト列が同じときだけ true', () => {
+    const key = new Uint8Array([1, 2, 3]);
+    expect(sameKey(new Uint8Array([1, 2, 3]).buffer, key)).toBe(true);
+    expect(sameKey(new Uint8Array([1, 2, 4]).buffer, key)).toBe(false);
+    expect(sameKey(new Uint8Array([1, 2]).buffer, key)).toBe(false);
+    expect(sameKey(null, key)).toBe(false);
   });
 });
 

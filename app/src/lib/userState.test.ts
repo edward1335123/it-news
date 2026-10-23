@@ -54,6 +54,17 @@ describe('保存する値のスキーマ', () => {
     expect(prefsSchema.parse({ notifyKeywords: ['MCP', 2] }).notifyKeywords).toEqual(['MCP']);
   });
 
+  it('通知の設定: PUSH_CONFIG に収まらない注目キーワードを捨てる', () => {
+    const tooLong = 'a'.repeat(NOTIFY_KEYWORD_MAX_LENGTH + 1);
+    expect(prefsSchema.parse({ notifyKeywords: [' MCP ', '', tooLong] }).notifyKeywords).toEqual([
+      'MCP',
+    ]);
+    const many = Array.from({ length: NOTIFY_KEYWORD_MAX_COUNT + 3 }, (_, i) => `k${i}`);
+    expect(prefsSchema.parse({ notifyKeywords: many }).notifyKeywords).toHaveLength(
+      NOTIFY_KEYWORD_MAX_COUNT,
+    );
+  });
+
   it('既読の記録から数値でない値を捨てる', () => {
     expect(readSchema.parse({ a: 1, b: 'x', c: null, d: Number.NaN })).toEqual({ a: 1 });
   });

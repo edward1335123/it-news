@@ -37,7 +37,10 @@ export const prefsSchema = z.object({
   /** OFF にした情報源の ID */
   disabledSources: lenientArray(z.string()).catch([]),
   /** 通知する注目キーワード（notifier に渡す。SPEC 8章） */
-  notifyKeywords: lenientArray(z.string()).catch([]),
+  notifyKeywords: lenientArray(z.string().trim().min(1).max(NOTIFY_KEYWORD_MAX_LENGTH))
+    // PUSH_CONFIG の形式（shared の notifyConfigSchema）に収まらない分は捨てる
+    .transform((words) => words.slice(0, NOTIFY_KEYWORD_MAX_COUNT))
+    .catch([]),
   /** 通知しない時間帯（日本時間）。null なら設けない */
   quietHours: quietHoursSchema.nullable().catch(DEFAULT_QUIET_HOURS),
 });

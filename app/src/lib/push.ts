@@ -81,8 +81,16 @@ export async function getSubscription(): Promise<PushSubscription | null> {
   return registration.pushManager.getSubscription();
 }
 
+/** 2つの鍵が同じバイト列か */
+export function sameKey(a: ArrayBuffer | null, b: Uint8Array): boolean {
+  if (a === null || a.byteLength !== b.length) return false;
+  const bytes = new Uint8Array(a);
+  return bytes.every((byte, i) => byte === b[i]);
+}
+
 /**
- * 通知を許可してもらい、購読する。すでに購読していればそれを返す。
+ * 通知を許可してもらい、購読する。同じ公開鍵ですでに購読していればそれを返す。
+ * VAPID 鍵を作り直した後の古い購読は送信が 403 になるので、解除して購読し直す。
  * iOS では利用者の操作（タップ）の中で呼ぶ必要がある。
  */
 export async function subscribe(publicKey: string): Promise<PushSubscription> {
@@ -91,12 +99,13 @@ export async function subscribe(publicKey: string): Promise<PushSubscription> {
     throw new Error('通知が許可されていません。iPhone の「設定」→「通知」から許可してください');
   }
   const registration = await readyRegistration();
+  const key = base64UrlToBytes(publicKey);
   const existing = await registration.pushManager.getSubscription();
-  if (existing !== null) return existing;
-  return registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: base64UrlToBytes(publicKey),
-  });
+  if (existing !== null) {
+    if (sameKey(existing.options.applicationServerKey, key)) return existing;
+    await existing.unsubscribe();
+  }
+  return registration.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: key });
 }
 
 /** 購読をやめる。購読していなければ何もしない */
