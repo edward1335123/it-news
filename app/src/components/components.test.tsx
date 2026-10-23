@@ -2,9 +2,10 @@ import type { Article, TechEvent } from '@itnews/shared';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { ArticleCard } from './ArticleCard';
+import { ArticleCard, CARD_MAX_TAGS, HOT_SCORE } from './ArticleCard';
 import { ChipBar } from './ChipBar';
 import { EventCard } from './EventCard';
+import { LangSwitch } from './LangSwitch';
 import { EmptyView, ErrorView, LoadingView } from './StatusView';
 import { TabBar } from './TabBar';
 
@@ -35,7 +36,7 @@ describe('ArticleCard', () => {
     onToggleSaved: () => undefined,
   };
 
-  it('タイトル・情報源・相対時刻・タグ・注目度・関連件数を表示する', () => {
+  it('タイトル・情報源・相対時刻・タグ・注目バッジ・関連件数を表示する', () => {
     render(<ArticleCard {...defaults} article={article} />);
     const link = screen.getByRole('link', { name: 'Claude Code の新機能' });
     expect(link).toHaveAttribute('href', 'https://example.com/a1');
@@ -45,14 +46,50 @@ describe('ArticleCard', () => {
     expect(screen.getByText('3時間前')).toHaveAttribute('datetime', article.publishedAt);
     const tags = within(screen.getByRole('list', { name: 'タグ' })).getAllByRole('listitem');
     expect(tags.map((t) => t.textContent)).toEqual(['AI駆動開発', 'AIエージェント']);
-    expect(screen.getByLabelText('注目度 90（注目）')).toBeInTheDocument();
+    expect(screen.getByText('注目')).toBeInTheDocument();
+    // 注目度の数字は出さない
+    expect(screen.queryByText('90')).not.toBeInTheDocument();
     expect(screen.getByText('他2件の報道')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2 })).toHaveTextContent(article.title);
   });
 
-  it('関連報道がなければ件数を出さず、注目度が低ければ強調しない', () => {
-    render(<ArticleCard {...defaults} article={{ ...article, related: [], score: 20 }} />);
+  it('関連報道がなければ件数を出さず、注目度がしきい値未満なら注目バッジを出さない', () => {
+    render(
+      <ArticleCard {...defaults} article={{ ...article, related: [], score: HOT_SCORE - 1 }} />,
+    );
     expect(screen.queryByText(/件の報道/)).not.toBeInTheDocument();
-    expect(screen.getByLabelText('注目度 20')).toHaveTextContent('20');
+    expect(screen.queryByText('注目')).not.toBeInTheDocument();
+  });
+
+  it('注目度がしきい値ちょうどなら注目バッジを出す', () => {
+    render(<ArticleCard {...defaults} article={{ ...article, score: HOT_SCORE }} />);
+    expect(screen.getByText('注目')).toBeInTheDocument();
+  });
+
+  it('英語の記事にだけ EN のラベルを付ける', () => {
+    const { unmount } = render(<ArticleCard {...defaults} article={article} />);
+    expect(screen.queryByText('EN')).not.toBeInTheDocument();
+    unmount();
+    render(<ArticleCard {...defaults} article={{ ...article, lang: 'en', title: 'New model' }} />);
+    expect(screen.getByText('EN')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'New model' })).toHaveAttribute('lang', 'en');
+  });
+
+  it('タグは最大2つまで表示する', () => {
+    render(
+      <ArticleCard
+        {...defaults}
+        article={{ ...article, tags: ['ai-dev', 'ai-agent', 'ai-model'] }}
+      />,
+    );
+    const tags = within(screen.getByRole('list', { name: 'タグ' })).getAllByRole('listitem');
+    expect(tags).toHaveLength(CARD_MAX_TAGS);
+    expect(tags.map((t) => t.textContent)).toEqual(['AI駆動開発', 'AIエージェント']);
+  });
+
+  it('タイトルの見出しレベルを指定できる', () => {
+    render(<ArticleCard {...defaults} article={article} titleLevel={3} />);
+    expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent(article.title);
   });
 
   it('タイトルの HTML をエスケープして表示する', () => {
@@ -233,5 +270,23 @@ describe('StatusView', () => {
     render(<EmptyView message="記事はありません" hint="別のサブカテゴリを選んでください" />);
     expect(screen.getByText('記事はありません')).toBeInTheDocument();
     expect(screen.getByText('別のサブカテゴリを選んでください')).toBeInTheDocument();
+  });
+});
+
+describe('LangSwitch', () => {
+  it('選んでいる言語を示し、押すと onChange を呼ぶ', async () => {
+    const onChange = vi.fn();
+    render(<LangSwitch value="all" onChange={onChange} />);
+    const group = screen.getByRole('group', { name: '表示する言語' });
+    expect(within(group).getByRole('button', { name: '日本語＋英語' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(within(group).getByRole('button', { name: '日本語のみ' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    await userEvent.click(within(group).getByRole('button', { name: '日本語のみ' }));
+    expect(onChange).toHaveBeenCalledWith('ja');
   });
 });

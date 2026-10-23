@@ -14,6 +14,7 @@ import newsJson from '../mock/news.json';
 import sourcesJson from '../mock/sources.json';
 import { App } from './App';
 import { normalizeText } from './lib/filter';
+import { formatDayLabel, tokyoDateKey } from './lib/format';
 import { storageKey } from './lib/storage';
 import { INVALID_DATA_MESSAGE } from './lib/useRemoteData';
 import { stubObjectUrl } from './test/stubObjectUrl';
@@ -245,6 +246,117 @@ describe('App', () => {
     }
   });
 
+  describe('日付の区切り・表示する言語', () => {
+    const aiTags: readonly string[] = CATEGORY_TAGS.ai;
+    /** 表示中の日付の区切り（見出しのテキストと記事のタイトル） */
+    function dayGroups(): { heading: string; titles: string[] }[] {
+      return within(screen.getByRole('main'))
+        .getAllByRole('region')
+        .map((region) => ({
+          heading: within(region).getByRole('heading', { level: 2 }).textContent,
+          titles: within(region)
+            .getAllByRole('article')
+            .map((card) => within(card).getByRole('link').textContent),
+        }));
+    }
+
+    function expectedDayGroups(titles: string[]): { heading: string; titles: string[] }[] {
+      const byTitle = new Map(articles.map((a) => [a.title, a]));
+      const groups = new Map<string, { label: string; titles: string[] }>();
+      for (const title of titles) {
+        const article = byTitle.get(title);
+        if (article === undefined) throw new Error(`記事がありません: ${title}`);
+        const key = tokyoDateKey(article.publishedAt);
+        const group = groups.get(key) ?? {
+          label: formatDayLabel(article.publishedAt, NOW),
+          titles: [],
+        };
+        group.titles.push(title);
+        groups.set(key, group);
+      }
+      return [...groups.values()].map((g) => ({
+        heading: `${g.label}${g.titles.length}件`,
+        titles: g.titles,
+      }));
+    }
+
+    it('記事を公開日ごとに区切り、見出しにその日の件数を出す', async () => {
+      render(<App />);
+      await screen.findAllByRole('article');
+      const groups = dayGroups();
+      expect(groups.length).toBeGreaterThan(1);
+      expect(groups[0]?.heading).toBe(`今日${groups[0]?.titles.length}件`);
+      expect(groups.map((g) => g.heading)).toContain(`昨日${groups[1]?.titles.length}件`);
+      expect(groups).toEqual(expectedDayGroups(expectedArticleTitles(CATEGORY_TAGS.ai)));
+      // 日付の見出しの下なので、記事のタイトルは h3
+      expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(cards().length);
+    });
+
+    it('「日本語のみ」で英語の記事を隠し、再読み込みしても残る。設定画面にも反映する', async () => {
+      const english = articles.filter(
+        (a) => a.lang === 'en' && a.tags.some((t) => aiTags.includes(t)),
+      );
+      expect(english.length).toBeGreaterThan(0);
+      const user = userEvent.setup();
+      const { unmount } = render(<App />);
+      await screen.findAllByRole('article');
+      const langGroup = () => screen.getByRole('group', { name: '表示する言語' });
+      expect(within(langGroup()).getByRole('button', { name: '日本語＋英語' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+      expect(screen.getAllByText('EN')).toHaveLength(english.length);
+
+      await user.click(within(langGroup()).getByRole('button', { name: '日本語のみ' }));
+      const jaTitles = expectedArticleTitles(CATEGORY_TAGS.ai).filter(
+        (title) => !english.some((a) => a.title === title),
+      );
+      expect(cardTitles()).toEqual(jaTitles);
+      expect(screen.queryByText('EN')).not.toBeInTheDocument();
+      expect(dayGroups()).toEqual(expectedDayGroups(jaTitles));
+
+      unmount();
+      render(<App />);
+      await screen.findAllByRole('article');
+      expect(cardTitles()).toEqual(jaTitles);
+      await user.click(screen.getByRole('button', { name: '設定' }));
+      expect(within(langGroup()).getByRole('button', { name: '日本語のみ' })).toHaveAttribute(
+        'aria-pressed',
+        'true',
+      );
+
+      // 設定画面で戻すとニュース画面にも反映する
+      await user.click(within(langGroup()).getByRole('button', { name: '日本語＋英語' }));
+      await user.click(screen.getByRole('button', { name: '戻る' }));
+      expect(cardTitles()).toEqual(expectedArticleTitles(CATEGORY_TAGS.ai));
+    });
+
+    it('保存タブには適用せず、検索結果には適用する', async () => {
+      const english = articles
+        .filter((a) => a.lang === 'en' && a.tags.some((t) => aiTags.includes(t)))
+        .sort(byNewest)[0];
+      if (english === undefined) throw new Error('英語の記事がありません');
+      const user = userEvent.setup();
+      render(<App />);
+      await screen.findAllByRole('article');
+      await user.click(
+        within(cardByTitle(english.title)).getByRole('button', { name: 'お気に入り' }),
+      );
+      await user.click(screen.getByRole('button', { name: '日本語のみ' }));
+      expect(cardTitles()).not.toContain(english.title);
+
+      await user.click(screen.getByRole('tab', { name: '保存' }));
+      expect(cardTitles()).toEqual([english.title]);
+      expect(within(cardByTitle(english.title)).getByText('EN')).toBeInTheDocument();
+      // 保存タブは日付で区切らない
+      expect(within(screen.getByRole('main')).queryAllByRole('region')).toHaveLength(0);
+
+      await user.click(screen.getByRole('button', { name: '検索' }));
+      await user.type(screen.getByRole('searchbox', { name: 'キーワード' }), english.title);
+      expect(cardTitles()).not.toContain(english.title);
+    });
+  });
+
   describe('端末内に保存する状態', () => {
     it('お気に入り・後で読むに追加すると保存タブに出て、再読み込みしても残る', async () => {
       const [first, second] = expectedArticleTitles(CATEGORY_TAGS.ai);
@@ -354,7 +466,8 @@ describe('App', () => {
         .map((a) => a.title);
       expect(expected.length).toBeGreaterThan(0);
       expect(cardTitles()).toEqual(expected);
-      expect(screen.getByText(`${expected.length}件`)).toBeInTheDocument();
+      // 日付の見出しにも「N件」が出るので、検索結果の件数は status で探す
+      expect(screen.getByRole('status')).toHaveTextContent(`${expected.length}件`);
 
       await user.clear(input);
       await user.type(input, 'zzzzzz');

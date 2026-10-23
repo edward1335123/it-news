@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>フェーズ9 画面の案</title>
+    <style>
+      /* 画面の案（幅375px）。フェーズ9 の見た目の確認用で、アプリには組み込まない */
+      .theme-light {
+        --color-bg: #f2f3f7;
+        --color-surface: #ffffff;
+        --color-surface-muted: #e8eaf0;
+        --color-text: #111827;
+        --color-text-muted: #4b5563;
+        --color-border: #c9cdd6;
+        --color-accent: #4338ca;
+        --color-on-accent: #ffffff;
+        --color-hot: #b91c1c;
+        --color-hot-bg: #fee2e2;
+        --color-bar: rgb(255 255 255 / 0.92);
+        --color-day-bar: rgb(242 243 247 / 0.94);
+      }
+      .theme-dark {
+        --color-bg: #0b0d12;
+        --color-surface: #171a21;
+        --color-surface-muted: #232733;
+        --color-text: #f3f4f6;
+        --color-text-muted: #a3a9b6;
+        --color-border: #353b4a;
+        --color-accent: #a5b4fc;
+        --color-on-accent: #111827;
+        --color-hot: #fca5a5;
+        --color-hot-bg: #3f1d1d;
+        --color-bar: rgb(23 26 33 / 0.92);
+        --color-day-bar: rgb(11 13 18 / 0.94);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 24px;
+        background: #888;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN',
+          'Noto Sans JP', 'Segoe UI', sans-serif;
+      }
+      h1,
+      h2,
+      h3,
+      p,
+      ul {
+        margin: 0;
+      }
+      ul {
+        padding: 0;
+        list-style: none;
+      }
+      .frames {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 32px;
+        align-items: flex-start;
+      }
+      .frame-label {
+        margin-bottom: 8px;
+        color: #fff;
+        font-weight: 700;
+      }
+      .frame {
+        width: 375px;
+        height: 760px;
+        overflow-y: auto;
+        overflow-x: hidden;
+        border-radius: 24px;
+        background: var(--color-bg);
+        color: var(--color-text);
+        font-size: 15px;
+        line-height: 1.5;
+        position: relative;
+      }
+      .header {
+        position: sticky;
+        top: 0;
+        z-index: 3;
+        display: flex;
+        align-items: center;
+        height: 52px;
+        padding: 0 8px 0 16px;
+        background: var(--color-bar);
+        border-bottom: 1px solid var(--color-border);
+      }
+      .header h1 {
+        flex: 1;
+        font-size: 22px;
+      }
+      .icon-btn {
+        width: 44px;
+        height: 44px;
+        display: grid;
+        place-items: center;
+        color: var(--color-text);
+      }
+      .main {
+        padding: 12px 16px 80px;
+      }
+      .chipbar {
+        display: flex;
+        gap: 8px;
+        margin: 0 -16px 8px;
+        padding: 4px 16px;
+        overflow: hidden;
+      }
+      .chip {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        height: 44px;
+        padding: 0 16px;
+        border: 1px solid var(--color-border);
+        border-radius: 999px;
+        background: var(--color-surface);
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .chip--on {
+        background: var(--color-accent);
+        border-color: var(--color-accent);
+        color: var(--color-on-accent);
+      }
+      .chip i {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+      /* 言語の切り替えと未読のみ */
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+      .segmented {
+        display: inline-flex;
+        padding: 2px;
+        border-radius: 999px;
+        background: var(--color-surface-muted);
+      }
+      .segmented span {
+        display: inline-flex;
+        align-items: center;
+        height: 40px;
+        padding: 0 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--color-text-muted);
+      }
+      .segmented .on {
+        background: var(--color-surface);
+        color: var(--color-text);
+        box-shadow: 0 1px 2px rgb(0 0 0 / 0.15);
+      }
+      .switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 44px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      .switch b {
+        width: 48px;
+        height: 28px;
+        border-radius: 999px;
+        background: var(--color-text-muted);
+        position: relative;
+      }
+      .switch b::before {
+        content: '';
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--color-surface);
+      }
+      .updated {
+        margin: 2px 0 4px;
+        color: var(--color-text-muted);
+        font-size: 12px;
+      }
+      /* 日付の見出し（固定） */
+      .day {
+        position: sticky;
+        top: 52px;
+        z-index: 2;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        margin: 0 -16px;
+        padding: 10px 16px 6px;
+        background: var(--color-day-bar);
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .day small {
+        color: var(--color-text-muted);
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .list {
+        display: grid;
+        gap: 8px;
+        padding: 4px 0 12px;
+      }
+      .card {
+        padding: 12px 16px 6px;
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        background: var(--color-surface);
+      }
+      .title {
+        font-size: 17px;
+        font-weight: 700;
+        line-height: 1.45;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .read .title {
+        color: var(--color-text-muted);
+        font-weight: 600;
+      }
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 4px 8px;
+        color: var(--color-text-muted);
+        font-size: 12px;
+      }
+      .meta .src {
+        font-weight: 600;
+      }
+      .en {
+        padding: 0 4px;
+        border: 1px solid var(--color-text-muted);
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1.4;
+        letter-spacing: 0.04em;
+      }
+      .hot {
+        padding: 0 8px;
+        border-radius: 999px;
+        background: var(--color-hot-bg);
+        color: var(--color-hot);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .readmark {
+        padding: 0 4px;
+        border: 1px solid var(--color-border);
+        border-radius: 4px;
+      }
+      .footer {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 44px;
+      }
+      .tags {
+        display: flex;
+        gap: 8px;
+        min-width: 0;
+        color: var(--color-text-muted);
+        font-size: 12px;
+      }
+      .tags li {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        white-space: nowrap;
+      }
+      .tags i {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+      }
+      .related {
+        color: var(--color-text-muted);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+      .actions {
+        display: flex;
+        margin: 0 -10px 0 auto;
+        color: var(--color-text-muted);
+      }
+      /* 案A: タイトルが先頭 */
+      .a .title {
+        margin-bottom: 4px;
+      }
+      .a .meta {
+        margin-bottom: 0;
+      }
+      /* 案B: 情報源・時刻が先頭 */
+      .b .meta {
+        margin-bottom: 4px;
+      }
+      .b .meta .push {
+        margin-left: auto;
+      }
+      .note {
+        max-width: 820px;
+        margin-top: 24px;
+        padding: 16px;
+        border-radius: 12px;
+        background: #fff;
+        line-height: 1.7;
+      }
+      .tabbar {
+        position: sticky;
+        bottom: 0;
+        z-index: 3;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        height: 56px;
+        background: var(--color-bar);
+        border-top: 1px solid var(--color-border);
+        color: var(--color-text-muted);
+        font-size: 12px;
+        font-weight: 600;
+        text-align: center;
+        align-items: center;
+      }
+      .tabbar .on {
+        color: var(--color-accent);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frames">
+      <div>
+        <p class="frame-label">案A（タイトルが先頭）ライト</p>
+        <div class="frame theme-light a" data-variant="a"></div>
+      </div>
+      <div>
+        <p class="frame-label">案B（情報源・時刻が先頭）ライト</p>
+        <div class="frame theme-light b" data-variant="b"></div>
+      </div>
+      <div>
+        <p class="frame-label">案A ダーク</p>
+        <div class="frame theme-dark a" data-variant="a"></div>
+      </div>
+      <div>
+        <p class="frame-label">案B ダーク</p>
+        <div class="frame theme-dark b" data-variant="b"></div>
+      </div>
+    </div>
+    <div class="note">
+      <p><b>ユーザーが確認した案: 案B（2026-10-23）。共通部分はこのまま</b></p>
+      <p><b>両案に共通する変更</b></p>
+      <ul>
+        <li>
+          ・記事を公開日（日本時間）で区切り、「今日
+          12件」のような見出しをスクロール中も上に固定する
+        </li>
+        <li>
+          ・チップの下に「日本語＋英語 /
+          日本語のみ」の切り替えと「未読のみ」を並べる。最終更新はその下に小さく
+        </li>
+        <li>・タイトルは 17px・太字・行間 1.45 で最大3行。情報源・時刻・タグは 12px の灰色</li>
+        <li>
+          ・注目度の数字はやめ、しきい値（80）以上だけ赤い「注目」バッジ。英語の記事には「EN」の枠付きラベル
+        </li>
+        <li>
+          ・タグは最大2つ。カードの枠線を少し濃くし（ライト #d6d9e0→#c9cdd6）、カードの間隔は 8px
+        </li>
+      </ul>
+    </div>
+    <script>
+      // 案の中身（同じ記事を2つの並べ方で表示する）
+      const tags = {
+        dev: ['AI駆動開発', '#6366f1'],
+        agent: ['AIエージェント', '#0891b2'],
+        model: ['モデル・LLM', '#7c3aed'],
+        sec: ['AIセキュリティ', '#dc2626'],
+        oss: ['ローカルLLM/OSS', '#16a34a'],
+      };
+      const days = [
+        {
+          label: '今日',
+          articles: [
+            {
+              title: 'Claude Code のサブエージェントで大規模リファクタリングを並列化した話',
+              src: 'Zenn',
+              time: '42分前',
+              tags: ['dev'],
+              related: 2,
+            },
+            {
+              title:
+                'Anthropic releases new model with improved agentic coding and long-context reasoning across enterprise workloads',
+              src: 'Anthropic',
+              time: '2時間前',
+              en: true,
+              hot: true,
+              tags: ['model', 'dev', 'agent'],
+              related: 5,
+            },
+            {
+              title: 'MCP サーバーの権限設計を見直す：最小権限で始めるエージェント運用',
+              src: 'ITmedia AI+',
+              time: '5時間前',
+              tags: ['agent', 'sec'],
+              read: true,
+            },
+          ],
+        },
+        {
+          label: '昨日',
+          articles: [
+            {
+              title: 'Copilot coding agent now supports custom review instructions',
+              src: 'GitHub Blog',
+              time: '18時間前',
+              en: true,
+              tags: ['dev', 'agent'],
+            },
+            {
+              title: 'Ollama でオープンウェイトのモデルを動かすときのメモリ見積もり',
+              src: 'Qiita',
+              time: '1日前',
+              tags: ['oss'],
+            },
+          ],
+        },
+        {
+          label: '10月20日（月）',
+          articles: [
+            {
+              title: 'プロンプトインジェクション対策の現状と、AI エージェントに求められる設計',
+              src: 'Security NEXT',
+              time: '2日前',
+              hot: true,
+              tags: ['sec'],
+              related: 1,
+            },
+          ],
+        },
+      ];
+      const esc = (s) => s.replace(/[&<>"]/g, (c) => `&#${c.charCodeAt(0)};`);
+      const tagHtml = (ids) =>
+        `<ul class="tags">${ids
+          .slice(0, 2)
+          .map((id) => `<li><i style="background:${tags[id][1]}"></i>${tags[id][0]}</li>`)
+          .join('')}</ul>`;
+      const actions =
+        '<div class="actions"><span class="icon-btn">☆</span><span class="icon-btn">◷</span></div>';
+      function card(a, variant) {
+        const en = a.en ? '<span class="en">EN</span>' : '';
+        const hot = a.hot ? '<span class="hot push">注目</span>' : '';
+        const read = a.read ? '<span class="readmark">既読</span>' : '';
+        const related = a.related ? `<span class="related">他${a.related}件の報道</span>` : '';
+        const title = `<h3 class="title">${esc(a.title)}</h3>`;
+        if (variant === 'a') {
+          const meta = `<div class="meta">${hot.replace(' push', '')}${en}<span class="src">${esc(a.src)}</span><span>${a.time}</span>${read}${related}</div>`;
+          return `<li class="card${a.read ? ' read' : ''}">${title}${meta}<div class="footer">${tagHtml(a.tags)}${actions}</div></li>`;
+        }
+        const meta = `<div class="meta"><span class="src">${esc(a.src)}</span><span>${a.time}</span>${read}${en}${hot}</div>`;
+        return `<li class="card${a.read ? ' read' : ''}">${meta}${title}<div class="footer">${tagHtml(a.tags)}${related}${actions}</div></li>`;
+      }
+      const chips = [
+        ['すべて', null, true],
+        ['AI駆動開発', '#6366f1'],
+        ['AIエージェント', '#0891b2'],
+        ['モデル・LLM', '#7c3aed'],
+      ]
+        .map(
+          ([label, color, on]) =>
+            `<span class="chip${on ? ' chip--on' : ''}">${color ? `<i style="background:${color}"></i>` : ''}${label}</span>`,
+        )
+        .join('');
+      for (const frame of document.querySelectorAll('.frame')) {
+        const v = frame.dataset.variant;
+        frame.innerHTML = `
+          <header class="header"><h1>AI</h1><span class="icon-btn">⌕</span><span class="icon-btn">⚙</span></header>
+          <div class="main">
+            <div class="chipbar">${chips}</div>
+            <div class="toolbar">
+              <div class="segmented"><span class="on">日本語＋英語</span><span>日本語のみ</span></div>
+              <span class="switch">未読のみ<b></b></span>
+            </div>
+            <p class="updated">最終更新 2026年10月22日 12:00（30分前）</p>
+            ${days
+              .map(
+                (d) =>
+                  `<h2 class="day">${d.label}<small>${d.articles.length}件</small></h2><ul class="list">${d.articles.map((a) => card(a, v)).join('')}</ul>`,
+              )
+              .join('')}
+          </div>
+          <nav class="tabbar"><span class="on">AI</span><span>セキュリティ</span><span>イベント</span><span>保存</span></nav>`;
+      }
+    </script>
+  </body>
+</html>

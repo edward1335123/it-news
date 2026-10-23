@@ -8,7 +8,7 @@ import {
 import type { Article } from '@itnews/shared';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { z } from 'zod';
-import { normalizeText } from './filter';
+import { LANG_MODES, normalizeText } from './filter';
 import { readStored, writeStored } from './storage';
 
 /** 端末内に保存するユーザーの状態（既読・お気に入り・後で読む・設定） */
@@ -32,6 +32,8 @@ function lenientArray<T>(item: z.ZodType<T>) {
 export const prefsSchema = z.object({
   /** 未読のみ表示 */
   unreadOnly: z.boolean().catch(false),
+  /** 表示する言語（SPEC 3.1）。既定は日本語＋英語 */
+  langMode: z.enum(LANG_MODES).catch('all'),
   /** ミュート語。タイトル・抜粋に含む記事を隠す */
   mutedWords: lenientArray(z.string()).catch([]),
   /** OFF にした情報源の ID */
@@ -48,6 +50,7 @@ export type Prefs = z.infer<typeof prefsSchema>;
 
 export const DEFAULT_PREFS: Prefs = {
   unreadOnly: false,
+  langMode: 'all',
   mutedWords: [],
   disabledSources: [],
   notifyKeywords: [],

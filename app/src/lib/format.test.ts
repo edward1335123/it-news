@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { formatDateTime, formatEventDate, formatParticipants, formatRelativeTime } from './format';
+import {
+  formatDateTime,
+  formatDayLabel,
+  formatEventDate,
+  formatParticipants,
+  formatRelativeTime,
+  tokyoDateKey,
+} from './format';
 
 describe('formatRelativeTime', () => {
   const now = new Date('2026-10-22T12:00:00+09:00');
@@ -26,6 +33,37 @@ describe('formatRelativeTime', () => {
   it('日付は東京時間で数える', () => {
     // UTC では 10/14 だが東京では 10/15
     expect(formatRelativeTime('2026-10-14T16:00:00Z', now)).toBe('10月15日');
+  });
+});
+
+describe('tokyoDateKey', () => {
+  it('東京時間の日付を返す', () => {
+    expect(tokyoDateKey('2026-10-22T14:59:59Z')).toBe('2026-10-22');
+    expect(tokyoDateKey('2026-10-22T15:00:00Z')).toBe('2026-10-23');
+    expect(tokyoDateKey('2026-01-05T09:00:00+09:00')).toBe('2026-01-05');
+  });
+});
+
+describe('formatDayLabel', () => {
+  const now = new Date('2026-10-23T00:30:00+09:00');
+
+  it.each([
+    ['2026-10-23T00:00:00+09:00', '今日'],
+    ['2026-10-23T23:59:59+09:00', '今日'],
+    ['2026-10-22T23:59:59+09:00', '昨日'],
+    ['2026-10-22T00:00:00+09:00', '昨日'],
+    ['2026-10-21T23:59:59+09:00', '10月21日（水）'],
+    ['2026-10-24T09:00:00+09:00', '10月24日（土）'],
+    ['2025-12-31T12:00:00+09:00', '2025年12月31日（水）'],
+  ])('%s → %s', (iso, expected) => {
+    expect(formatDayLabel(iso, now)).toBe(expected);
+  });
+
+  it('今日・昨日は東京時間で数える', () => {
+    // UTC では 10/22 15:30 だが東京では 10/23 0:30
+    const lateNight = new Date('2026-10-22T15:30:00Z');
+    expect(formatDayLabel('2026-10-22T15:00:00Z', lateNight)).toBe('今日');
+    expect(formatDayLabel('2026-10-22T14:00:00Z', lateNight)).toBe('昨日');
   });
 });
 

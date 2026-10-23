@@ -42,6 +42,12 @@ describe('保存する値のスキーマ', () => {
     expect(prefsSchema.parse({})).toEqual(DEFAULT_PREFS);
   });
 
+  it('表示する言語: 既定は日本語＋英語で、知らない値なら既定値にする', () => {
+    expect(DEFAULT_PREFS.langMode).toBe('all');
+    expect(prefsSchema.parse({ langMode: 'ja' }).langMode).toBe('ja');
+    expect(prefsSchema.parse({ langMode: 'en' }).langMode).toBe('all');
+  });
+
   it('通知の設定: 静かな時間帯は null（使わない）を保ち、壊れていれば既定値にする', () => {
     expect(prefsSchema.parse({ quietHours: null }).quietHours).toBeNull();
     expect(prefsSchema.parse({ quietHours: { start: 1, end: 6 } }).quietHours).toEqual({

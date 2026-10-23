@@ -5,6 +5,7 @@ import {
   articlesForTab,
   eventEndTime,
   filterEvents,
+  groupArticlesByDay,
   normalizeText,
   searchArticles,
   sortEvents,
@@ -129,7 +130,13 @@ describe('applyArticleFilter', () => {
     article('c', [], '2026-10-22T00:00:00Z', { source: 'publickey' }),
     article('d', [], '2026-10-22T00:00:00Z', { source: 'qiita' }),
   ];
-  const none = { mutedWords: [], disabledSources: [], unreadOnly: false, isRead: () => false };
+  const none = {
+    langMode: 'all',
+    mutedWords: [],
+    disabledSources: [],
+    unreadOnly: false,
+    isRead: () => false,
+  } as const;
 
   it('条件がなければすべて返す', () => {
     expect(ids(applyArticleFilter(list, none))).toEqual(['a', 'b', 'c', 'd']);
@@ -155,6 +162,53 @@ describe('applyArticleFilter', () => {
       'd',
     ]);
     expect(ids(applyArticleFilter(list, { ...none, isRead }))).toEqual(['a', 'b', 'c', 'd']);
+  });
+
+  it('「日本語のみ」なら英語の記事を隠し、「日本語＋英語」なら両方を表示する', () => {
+    const mixed = [...list, article('e', [], '2026-10-22T00:00:00Z', { lang: 'en' })];
+    expect(ids(applyArticleFilter(mixed, { ...none, langMode: 'ja' }))).toEqual([
+      'a',
+      'b',
+      'c',
+      'd',
+    ]);
+    expect(ids(applyArticleFilter(mixed, none))).toEqual(['a', 'b', 'c', 'd', 'e']);
+  });
+});
+
+describe('groupArticlesByDay', () => {
+  const now = new Date('2026-10-23T10:00:00+09:00');
+
+  it('公開日（東京時間）ごとに分け、見出しと記事の順番を保つ', () => {
+    const list = [
+      article('a', [], '2026-10-23T09:00:00+09:00'),
+      article('b', [], '2026-10-23T00:00:00+09:00'),
+      // UTC では 10/22 だが東京では 10/23 の 0:30
+      article('c', [], '2026-10-22T15:30:00Z'),
+      article('d', [], '2026-10-22T23:59:59+09:00'),
+      article('e', [], '2026-10-21T08:00:00+09:00'),
+      article('f', [], '2025-12-31T20:00:00+09:00'),
+    ];
+    const groups = groupArticlesByDay(list, now);
+    expect(groups.map((g) => [g.key, g.label, ids(g.articles)])).toEqual([
+      ['2026-10-23', '今日', ['a', 'b', 'c']],
+      ['2026-10-22', '昨日', ['d']],
+      ['2026-10-21', '10月21日（水）', ['e']],
+      ['2025-12-31', '2025年12月31日（水）', ['f']],
+    ]);
+  });
+
+  it('同じ日の記事が離れていても1つの区切りにまとめる', () => {
+    const list = [
+      article('a', [], '2026-10-23T09:00:00+09:00'),
+      article('b', [], '2026-10-22T09:00:00+09:00'),
+      article('c', [], '2026-10-23T08:00:00+09:00'),
+    ];
+    expect(groupArticlesByDay(list, now).map((g) => ids(g.articles))).toEqual([['a', 'c'], ['b']]);
+  });
+
+  it('記事がなければ区切りもない', () => {
+    expect(groupArticlesByDay([], now)).toEqual([]);
   });
 });
 

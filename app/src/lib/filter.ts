@@ -1,5 +1,6 @@
 import { CATEGORY_TAGS, normalizeText } from '@itnews/shared';
 import type { Article, TagId, TechEvent } from '@itnews/shared';
+import { formatDayLabel, tokyoDateKey } from './format';
 
 /** サブカテゴリのチップで絞り込むニュースのタブ */
 export type NewsTab = keyof typeof CATEGORY_TAGS;
@@ -57,7 +58,18 @@ export function searchArticles(articles: readonly Article[], query: string): Art
   );
 }
 
+/** 表示する言語（SPEC 3.1）。`all` は日本語＋英語 */
+export const LANG_MODES = ['all', 'ja'] as const;
+export type LangMode = (typeof LANG_MODES)[number];
+
+export const LANG_MODE_LABELS: Record<LangMode, string> = {
+  all: '日本語＋英語',
+  ja: '日本語のみ',
+};
+
 export type ArticleFilter = {
+  /** `ja` なら英語の記事を隠す */
+  langMode: LangMode;
   /** タイトル・抜粋にどれかを含む記事を隠す */
   mutedWords: readonly string[];
   /** OFF にした情報源の ID */
@@ -67,11 +79,12 @@ export type ArticleFilter = {
   isRead: (id: string) => boolean;
 };
 
-/** ミュート語・情報源の ON/OFF・未読のみ表示を適用する */
+/** 表示する言語・ミュート語・情報源の ON/OFF・未読のみ表示を適用する */
 export function applyArticleFilter(articles: readonly Article[], filter: ArticleFilter): Article[] {
   const muted = filter.mutedWords.map(normalizeText).filter((w) => w.trim() !== '');
   const disabled = new Set(filter.disabledSources);
   return articles.filter((a) => {
+    if (filter.langMode === 'ja' && a.lang !== 'ja') return false;
     if (disabled.has(a.source)) return false;
     if (filter.unreadOnly && filter.isRead(a.id)) return false;
     if (muted.length > 0) {
@@ -80,6 +93,33 @@ export function applyArticleFilter(articles: readonly Article[], filter: Article
     }
     return true;
   });
+}
+
+export type DayGroup = {
+  /** 東京時間の日付（2026-10-22 の形式） */
+  key: string;
+  /** 見出し（今日 / 昨日 / 10月21日（火）） */
+  label: string;
+  articles: Article[];
+};
+
+/** 記事を公開日（東京時間）ごとに分ける。日付・記事の順番は渡した順のまま */
+export function groupArticlesByDay(articles: readonly Article[], now: Date): DayGroup[] {
+  const groups = new Map<string, DayGroup>();
+  for (const article of articles) {
+    const key = tokyoDateKey(article.publishedAt);
+    const group = groups.get(key);
+    if (group === undefined) {
+      groups.set(key, {
+        key,
+        label: formatDayLabel(article.publishedAt, now),
+        articles: [article],
+      });
+    } else {
+      group.articles.push(article);
+    }
+  }
+  return [...groups.values()];
 }
 
 /** イベントを開催日が近い順に返す */

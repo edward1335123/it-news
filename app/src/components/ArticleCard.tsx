@@ -5,8 +5,10 @@ import type { SavedList } from '../lib/userState';
 import { ClockIcon, StarIcon } from './icons';
 import { TagList } from './TagList';
 
-/** この値以上の注目度を強調して表示する */
+/** この値以上の注目度の記事に「注目」バッジを付ける */
 export const HOT_SCORE = 80;
+/** カードに表示するタグの数の上限（SPEC 3.1） */
+export const CARD_MAX_TAGS = 2;
 
 type Props = {
   article: Article;
@@ -18,6 +20,8 @@ type Props = {
   /** 記事を開いたとき（既読にする） */
   onOpen: () => void;
   onToggleSaved: (list: SavedList) => void;
+  /** タイトルの見出しレベル。既定は 2 */
+  titleLevel?: 2 | 3 | undefined;
 };
 
 export function ArticleCard({
@@ -28,9 +32,11 @@ export function ArticleCard({
   saved,
   onOpen,
   onToggleSaved,
+  titleLevel = 2,
 }: Props) {
   const relatedCount = article.related.length;
   const hot = article.score >= HOT_SCORE;
+  const Title = titleLevel === 3 ? 'h3' : 'h2';
   return (
     <article className={read ? 'card card--read' : 'card'}>
       <div className="card__meta">
@@ -39,15 +45,14 @@ export function ArticleCard({
           {formatRelativeTime(article.publishedAt, now)}
         </time>
         {read && <span className="card__read">既読</span>}
-        <span
-          className={hot ? 'score score--hot' : 'score'}
-          aria-label={`注目度 ${article.score}${hot ? '（注目）' : ''}`}
-        >
-          {hot ? '注目 ' : ''}
-          {article.score}
-        </span>
+        {article.lang === 'en' && (
+          <span className="lang-label" title="英語の記事">
+            EN
+          </span>
+        )}
+        {hot && <span className="hot-badge">注目</span>}
       </div>
-      <h2 className="card__title">
+      <Title className="card__title">
         {/* カード全体をタップ領域にする（CSS の ::after で広げる） */}
         <a
           className="card__link"
@@ -63,9 +68,9 @@ export function ArticleCard({
         >
           {article.title}
         </a>
-      </h2>
+      </Title>
       <div className="card__footer">
-        <TagList tags={article.tags} />
+        <TagList tags={article.tags} max={CARD_MAX_TAGS} />
         {relatedCount > 0 && <span className="card__related">他{relatedCount}件の報道</span>}
         <div className="card__actions">
           <button

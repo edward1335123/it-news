@@ -8,10 +8,12 @@ type Props = {
   sourceNames: ReadonlyMap<string, string>;
   now: Date;
   user: UserState;
+  /** 記事のタイトルの見出しレベル。日付の見出しの下に置くときは 3 にする */
+  titleLevel?: 2 | 3 | undefined;
 };
 
 /** 既読・保存の状態を反映した記事カードの一覧 */
-export function ArticleList({ articles, sourceNames, now, user }: Props) {
+export function ArticleList({ articles, sourceNames, now, user, titleLevel }: Props) {
   return (
     <ul className="list">
       {articles.map((article) => (
@@ -20,6 +22,7 @@ export function ArticleList({ articles, sourceNames, now, user }: Props) {
             article={article}
             sourceName={sourceNames.get(article.source) ?? article.source}
             now={now}
+            titleLevel={titleLevel}
             read={user.isRead(article.id)}
             saved={{
               favorite: isSaved(user.saved, 'favorite', article.id),

@@ -42,6 +42,26 @@ function tokyoParts(date: Date): TokyoParts {
   };
 }
 
+/** 東京時間の日付のキー（2026-10-22 の形式）。日付ごとに区切るときに使う */
+export function tokyoDateKey(iso: string): string {
+  const p = tokyoParts(new Date(iso));
+  return `${p.year}-${String(p.month).padStart(2, '0')}-${String(p.day).padStart(2, '0')}`;
+}
+
+/**
+ * 日付の見出し（今日 / 昨日 / 10月21日（火））。日付は東京時間で数える。
+ * 今年でなければ年も出す。
+ */
+export function formatDayLabel(iso: string, now: Date): string {
+  const key = tokyoDateKey(iso);
+  if (key === tokyoDateKey(now.toISOString())) return '今日';
+  // 東京には夏時間がないので、24時間前は必ず前日になる
+  if (key === tokyoDateKey(new Date(now.getTime() - DAY).toISOString())) return '昨日';
+  const p = tokyoParts(new Date(iso));
+  const date = `${p.month}月${p.day}日（${p.weekday}）`;
+  return p.year === tokyoParts(now).year ? date : `${p.year}年${date}`;
+}
+
 /** 2026年10月22日 11:30 の形式 */
 export function formatDateTime(iso: string): string {
   const p = tokyoParts(new Date(iso));

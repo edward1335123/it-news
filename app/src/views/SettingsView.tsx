@@ -1,5 +1,6 @@
 import { CATEGORIES } from '@itnews/shared';
 import type { SourcesFile } from '@itnews/shared';
+import { LangSwitch } from '../components/LangSwitch';
 import { ErrorView, LoadingView } from '../components/StatusView';
 import { Switch } from '../components/Switch';
 import { WordEditor } from '../components/WordEditor';
@@ -29,6 +30,18 @@ export function SettingsView({ sources, onRetrySources, user }: Props) {
           表示
         </h2>
         <div className="settings__group">
+          <div className="setting-row">
+            <span className="switch__text">
+              <span className="switch__label">表示する言語</span>
+              <span className="switch__description">
+                AI・セキュリティ・検索結果に適用します。保存した記事は言語に関係なく表示します
+              </span>
+            </span>
+            <LangSwitch
+              value={user.prefs.langMode}
+              onChange={(langMode) => user.updatePrefs((prev) => ({ ...prev, langMode }))}
+            />
+          </div>
           <Switch
             checked={user.prefs.unreadOnly}
             onChange={(unreadOnly) => user.updatePrefs((prev) => ({ ...prev, unreadOnly }))}
