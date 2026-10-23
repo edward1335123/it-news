@@ -12,9 +12,16 @@ const HOST_INTERVAL_MS = 2_000;
 const SOURCES_PATH = join(DATA_DIR, 'sources.json');
 const NEWS_PATH = join(DATA_DIR, 'news.json');
 
-/** 前回の news.json。なければ空、形式が違えば警告して空にする */
+/** 前回の news.json。なければ空、JSON や形式が正しくなければ警告して空にする */
 async function readPrevious(): Promise<Article[]> {
-  const json = await readJson(NEWS_PATH);
+  let json: unknown;
+  try {
+    json = await readJson(NEWS_PATH);
+  } catch (error) {
+    if (!(error instanceof SyntaxError)) throw error;
+    log.warn(`[news] 前回の news.json が JSON として正しくないため使わない: ${error.message}`);
+    return [];
+  }
   if (json === undefined) return [];
   const parsed = newsFileSchema.safeParse(json);
   if (parsed.success) return parsed.data.articles;

@@ -9,7 +9,8 @@ on:
     - cron: '17 * * * *'
   workflow_dispatch:
 
-# 前回の data/*.json を引き継ぐので、同時に2つ走らせない（後から来た実行は待つ）
+# 前回の data/*.json を引き継ぐので、同時に2つ走らせない。
+# 待てるのは最新の1件だけで、それより前に待っていた実行は取り消される
 concurrency:
   group: deploy
   cancel-in-progress: false
@@ -31,9 +32,9 @@ jobs:
 
       - run: npm ci
 
-      # 定時実行ではコードが変わらないので、Actions の利用時間を抑えるため push のときだけ検証する
+      # 定時実行でも検証する。push の実行が失敗したコミットや、
+      # 後から来た実行に取り消されたコミットを、検証せずにデプロイしないため
       - name: lint・型・テスト
-        if: github.event_name != 'schedule'
         run: npm run check
 
       # news.json・events.json は git 管理外なので、前回の実行で保存したものを戻す。
@@ -61,10 +62,11 @@ jobs:
           wait "$news" || echo "::warning::ニュースの収集に失敗した。前回の news.json を使う"
           wait "$events" || echo "::warning::イベントの収集に失敗した。前回の events.json を使う"
 
+      # 壊れたファイルを保存・デプロイしないよう、JSON として読めるかまで確かめる
       - name: データがあるか確かめる
         run: |
           for f in news.json events.json; do
-            test -s "app/public/data/$f" || { echo "::error::app/public/data/$f がない"; exit 1; }
+            node -e 'JSON.parse(require("fs").readFileSync(process.argv[1], "utf8"))' "app/public/data/$f"               || { echo "::error::app/public/data/$f がないか、JSON として正しくない"; exit 1; }
           done
 
       - name: データを次回のために保存する
@@ -77,7 +79,8 @@ jobs:
 
       - run: npm run build
 
-      # --branch=main で本番（Production）のデプロイになる
+      # --branch=main で本番（Production）のデプロイになる。
+      # API トークンを渡すので、wrangler は版を固定する（上げるときは DEPLOY.md の版も揃える）
       - name: Cloudflare Pages にデプロイ
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -85,4 +88,4 @@ jobs:
           PROJECT: ${{ vars.CLOUDFLARE_PAGES_PROJECT }}
         run: |
           test -n "$PROJECT" || { echo "::error::Variables に CLOUDFLARE_PAGES_PROJECT がない"; exit 1; }
-          npx --yes wrangler@4 pages deploy app/dist --project-name="$PROJECT" --branch=main --commit-dirty=true
+          npx --yes wrangler@4.152.0 pages deploy app/dist --project-name="$PROJECT" --branch=main --commit-dirty=true

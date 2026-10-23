@@ -8,7 +8,7 @@ const workflow = readFileSync(
   'utf8',
 );
 
-/** ステップの名前（`- name:`）か `- run:` を上から順に並べる */
+/** ステップの名前（`- name:`）・`- run:`・`- uses:` を上から順に並べる */
 const steps = [...workflow.matchAll(/^ {6}- (?:name|run|uses): (.+)$/gm)].map((m) => m[1]);
 const indexOf = (label: string) => {
   const i = steps.findIndex((s) => s?.includes(label));
@@ -34,9 +34,13 @@ describe('deploy.yml', () => {
     expect(order).toEqual([...order].sort((a, b) => a - b));
   });
 
-  it('push のときはデプロイの前に lint・型・テストを通す', () => {
+  it('push でも cron でも、デプロイの前に lint・型・テストを通す', () => {
     expect(indexOf('lint・型・テスト')).toBeLessThan(indexOf('Cloudflare Pages にデプロイ'));
-    expect(workflow).toContain('run: npm run check');
+    expect(workflow).toMatch(/- name: lint・型・テスト\n {8}run: npm run check$/m);
+  });
+
+  it('wrangler は版を固定して実行する', () => {
+    expect(workflow).toMatch(/wrangler@\d+\.\d+\.\d+ pages deploy/);
   });
 
   it('秘密情報は Secrets から渡し、ファイルに直接書かない', () => {

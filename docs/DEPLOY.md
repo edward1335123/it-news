@@ -15,14 +15,14 @@ Cloudflare Pages（<project>.pages.dev）← Cloudflare Access（メールOTP）
 | きっかけ | 内容 |
 |---|---|
 | `main` への push | `npm run check` → 収集 → ビルド → デプロイ |
-| 毎時17分（cron） | 収集 → ビルド → デプロイ（コードは変わらないので `npm run check` は省く） |
+| 毎時17分（cron） | push と同じ（push の実行が失敗・取り消しになったコミットを検証せずに出さないため、毎回 `npm run check` を通す） |
 | 手動（Actions 画面の「Run workflow」） | push と同じ |
 
 - `news.json`・`events.json` は git に含めない。前回の実行で保存したものを Actions のキャッシュから戻し、収集で追記してから、次回のために保存し直す
 - キャッシュが消えたとき（7日使われない、手動で削除した、など）は空から集め直す。記事は30日分がそろうまで少なくなる
 - 一部の情報源が失敗してもデプロイは続ける。すべて失敗したときは前回のファイルをそのまま使う。前回のファイルもない（初回で全滅した）ときはデプロイしない
-- 同時に2つは走らせない。前の実行が終わるまで次は待つ
-- GitHub の cron は混雑すると数分〜数十分遅れることがある。また、60日間 push がないリポジトリでは定時実行が自動で止まるので、そのときは Actions 画面で有効に戻す
+- 同時に2つは走らせない。実行中のものがあると次は待つ。ただし待てるのは最新の1件だけで、それより前に待っていた実行は取り消される（毎回 `npm run check` を通すので、取り消されても検証していないコードは出ない）
+- GitHub の cron は混雑すると数分〜数十分遅れることがある。また、公開リポジトリでは60日間 push などの動きがないと定時実行が自動で止まるので、そのときは Actions 画面で有効に戻す
 
 ## 2. Secrets と Variables
 
@@ -44,9 +44,11 @@ GitHub のリポジトリの **Settings → Secrets and variables → Actions** 
 手元で一度だけ実行する（ブラウザで Cloudflare へのログインを求められる）。`<project>` は好きな名前にする。これが `https://<project>.pages.dev` の URL になり、Variable `CLOUDFLARE_PAGES_PROJECT` に登録する名前になる。
 
 ```sh
-npx wrangler@4 login
-npx wrangler@4 pages project create <project> --production-branch=main --force
+npx wrangler@4.152.0 login
+npx wrangler@4.152.0 pages project create <project> --production-branch=main --force
 ```
+
+wrangler の版は `.github/workflows/deploy.yml` と揃える。
 
 最近の wrangler は、`pages project create` を新しい Pages（Workers の一部）に振り替えようとし、ワークスペースのルートでは失敗する。`--force` を付けると従来の Pages にプロジェクトを作る。`--force` が要るのは作成のときだけで、作ったあとの `pages deploy` は従来の Pages に対して動く。
 
@@ -82,6 +84,7 @@ npx wrangler@4 pages project create <project> --production-branch=main --force
 - 非公開（private）リポジトリは、無料プランで月2,000分まで。毎時の実行は月に約720回で、1回あたりの時間は分単位に切り上げて数える。1回3分かかると月2,160分になり、上限を超える
 - 非公開にしたいときは、Actions 画面で1回の時間を確かめ、2分を超えるなら cron の間隔を広げる（例: `'17 */2 * * *'` で2時間ごと）
 - リポジトリには秘密情報を含めていない（すべて Secrets に置く）ので、公開しても中身から漏れるものはない。収集したデータ（news.json・events.json）もリポジトリには入らない
+- ただし公開リポジトリでは、Actions の実行履歴とログも誰でも見られる。ログにはデプロイごとの URL（Access で守られている）や、情報源ごとの取得エラーが出る。API キーはログに出さない
 
 ## 5. Cloudflare Access（メールOTP認証）
 
@@ -141,6 +144,6 @@ manifest は Access の Cookie を付けて取得する設定にしている（`
 |---|---|
 | デプロイで `Authentication error` | `CLOUDFLARE_API_TOKEN` の権限（Cloudflare Pages / Edit）と、`CLOUDFLARE_ACCOUNT_ID` |
 | デプロイで `Project not found` | Variable `CLOUDFLARE_PAGES_PROJECT` が 3.1 で作った名前と一致しているか |
-| `app/public/data/news.json がない` で止まる | 初回の収集がすべて失敗した。ログの `[news]`・`[events]` を見て、時間をおいて再実行する |
+| `app/public/data/news.json がないか、JSON として正しくない` で止まる | 初回の収集がすべて失敗した。ログの `[news]`・`[events]` を見て、時間をおいて再実行する |
 | connpass のイベントが出ない | `CONNPASS_API_KEY` を登録したか。ログに「CONNPASS_API_KEY が未設定」と出ていないか |
-| 定時実行が止まった | 60日間 push がないと止まる。Actions 画面で `deploy` を有効に戻す |
+| 定時実行が止まった | 公開リポジトリでは60日間 push などの動きがないと止まる。Actions 画面で `deploy` を有効に戻す |
