@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  formatClockTime,
   formatDateTime,
   formatDayLabel,
   formatEventDate,
@@ -64,6 +65,13 @@ describe('formatDayLabel', () => {
     const lateNight = new Date('2026-10-22T15:30:00Z');
     expect(formatDayLabel('2026-10-22T15:00:00Z', lateNight)).toBe('今日');
     expect(formatDayLabel('2026-10-22T14:00:00Z', lateNight)).toBe('昨日');
+  });
+});
+
+describe('formatClockTime', () => {
+  it('東京時間の時刻を2桁ずつで返す', () => {
+    expect(formatClockTime('2026-10-22T12:40:00Z')).toBe('21:40');
+    expect(formatClockTime('2026-10-22T00:05:00+09:00')).toBe('00:05');
   });
 });
 

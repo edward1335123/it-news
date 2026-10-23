@@ -1,5 +1,5 @@
 import type { Article } from '@itnews/shared';
-import { formatDateTime, formatRelativeTime } from '../lib/format';
+import { formatClockTime, formatDateTime, formatRelativeTime } from '../lib/format';
 import { SAVED_LIST_LABELS } from '../lib/userState';
 import type { SavedList } from '../lib/userState';
 import { ClockIcon, StarIcon } from './icons';
@@ -22,6 +22,11 @@ type Props = {
   onToggleSaved: (list: SavedList) => void;
   /** タイトルの見出しレベル。既定は 2 */
   titleLevel?: 2 | 3 | undefined;
+  /**
+   * 時刻の出し方。`relative` は「3時間前」、`clock` は「21:40」。
+   * 日付の見出しの下で、昨日以前の記事に `clock` を使う
+   */
+  timeFormat?: 'relative' | 'clock' | undefined;
 };
 
 export function ArticleCard({
@@ -33,6 +38,7 @@ export function ArticleCard({
   onOpen,
   onToggleSaved,
   titleLevel = 2,
+  timeFormat = 'relative',
 }: Props) {
   const relatedCount = article.related.length;
   const hot = article.score >= HOT_SCORE;
@@ -42,7 +48,9 @@ export function ArticleCard({
       <div className="card__meta">
         <span className="card__source">{sourceName}</span>
         <time dateTime={article.publishedAt} title={formatDateTime(article.publishedAt)}>
-          {formatRelativeTime(article.publishedAt, now)}
+          {timeFormat === 'clock'
+            ? formatClockTime(article.publishedAt)
+            : formatRelativeTime(article.publishedAt, now)}
         </time>
         {read && <span className="card__read">既読</span>}
         {article.lang === 'en' && (

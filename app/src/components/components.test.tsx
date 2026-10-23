@@ -87,6 +87,12 @@ describe('ArticleCard', () => {
     expect(tags.map((t) => t.textContent)).toEqual(['AI駆動開発', 'AIエージェント']);
   });
 
+  it('時刻を「21:40」の形式でも出せる', () => {
+    render(<ArticleCard {...defaults} article={article} timeFormat="clock" />);
+    expect(screen.getByText('09:00')).toHaveAttribute('datetime', article.publishedAt);
+    expect(screen.queryByText('3時間前')).not.toBeInTheDocument();
+  });
+
   it('タイトルの見出しレベルを指定できる', () => {
     render(<ArticleCard {...defaults} article={article} titleLevel={3} />);
     expect(screen.getByRole('heading', { level: 3 })).toHaveTextContent(article.title);

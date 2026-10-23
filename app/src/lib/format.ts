@@ -62,6 +62,12 @@ export function formatDayLabel(iso: string, now: Date): string {
   return p.year === tokyoParts(now).year ? date : `${p.year}年${date}`;
 }
 
+/** 東京時間の時刻（21:40 の形式） */
+export function formatClockTime(iso: string): string {
+  const p = tokyoParts(new Date(iso));
+  return `${p.hour}:${p.minute}`;
+}
+
 /** 2026年10月22日 11:30 の形式 */
 export function formatDateTime(iso: string): string {
   const p = tokyoParts(new Date(iso));

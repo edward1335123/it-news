@@ -292,6 +292,22 @@ describe('App', () => {
       expect(screen.getAllByRole('heading', { level: 3 })).toHaveLength(cards().length);
     });
 
+    it('今日の記事は相対表示、昨日以前の記事は時刻で表示する', async () => {
+      render(<App />);
+      await screen.findAllByRole('article');
+      const regions = within(screen.getByRole('main')).getAllByRole('region');
+      const times = (region: HTMLElement) =>
+        within(region)
+          .getAllByRole('article')
+          .map((card) => card.querySelector('time')?.textContent);
+      const [today, ...older] = regions;
+      if (today === undefined || older.length === 0) throw new Error('区切りが足りません');
+      for (const text of times(today)) expect(text).toMatch(/前$|^たった今$/);
+      for (const region of older) {
+        for (const text of times(region)) expect(text).toMatch(/^\d{2}:\d{2}$/);
+      }
+    });
+
     it('「日本語のみ」で英語の記事を隠し、再読み込みしても残る。設定画面にも反映する', async () => {
       const english = articles.filter(
         (a) => a.lang === 'en' && a.tags.some((t) => aiTags.includes(t)),

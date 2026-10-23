@@ -100,12 +100,15 @@ export type DayGroup = {
   key: string;
   /** 見出し（今日 / 昨日 / 10月21日（火）） */
   label: string;
+  /** 今日（東京時間）の区切りか */
+  today: boolean;
   articles: Article[];
 };
 
 /** 記事を公開日（東京時間）ごとに分ける。日付・記事の順番は渡した順のまま */
 export function groupArticlesByDay(articles: readonly Article[], now: Date): DayGroup[] {
   const groups = new Map<string, DayGroup>();
+  const todayKey = tokyoDateKey(now.toISOString());
   for (const article of articles) {
     const key = tokyoDateKey(article.publishedAt);
     const group = groups.get(key);
@@ -113,6 +116,7 @@ export function groupArticlesByDay(articles: readonly Article[], now: Date): Day
       groups.set(key, {
         key,
         label: formatDayLabel(article.publishedAt, now),
+        today: key === todayKey,
         articles: [article],
       });
     } else {

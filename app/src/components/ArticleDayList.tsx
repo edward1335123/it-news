@@ -31,6 +31,8 @@ export function ArticleDayList({ articles, sourceNames, now, user }: Props) {
               now={now}
               user={user}
               titleLevel={3}
+              // 昨日以前は見出しで日付が分かるので、時刻だけを出す
+              timeFormat={group.today ? 'relative' : 'clock'}
             />
           </section>
         );

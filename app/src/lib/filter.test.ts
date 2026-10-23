@@ -190,11 +190,11 @@ describe('groupArticlesByDay', () => {
       article('f', [], '2025-12-31T20:00:00+09:00'),
     ];
     const groups = groupArticlesByDay(list, now);
-    expect(groups.map((g) => [g.key, g.label, ids(g.articles)])).toEqual([
-      ['2026-10-23', '今日', ['a', 'b', 'c']],
-      ['2026-10-22', '昨日', ['d']],
-      ['2026-10-21', '10月21日（水）', ['e']],
-      ['2025-12-31', '2025年12月31日（水）', ['f']],
+    expect(groups.map((g) => [g.key, g.label, g.today, ids(g.articles)])).toEqual([
+      ['2026-10-23', '今日', true, ['a', 'b', 'c']],
+      ['2026-10-22', '昨日', false, ['d']],
+      ['2026-10-21', '10月21日（水）', false, ['e']],
+      ['2025-12-31', '2025年12月31日（水）', false, ['f']],
     ]);
   });
 
