@@ -45,8 +45,10 @@ GitHub のリポジトリの **Settings → Secrets and variables → Actions** 
 
 ```sh
 npx wrangler@4 login
-npx wrangler@4 pages project create <project> --production-branch=main
+npx wrangler@4 pages project create <project> --production-branch=main --force
 ```
+
+最近の wrangler は、`pages project create` を新しい Pages（Workers の一部）に振り替えようとし、ワークスペースのルートでは失敗する。`--force` を付けると従来の Pages にプロジェクトを作る。`--force` が要るのは作成のときだけで、作ったあとの `pages deploy` は従来の Pages に対して動く。
 
 ダッシュボードの **Workers & Pages → Create → Pages → Direct Upload** から作ってもよい。Git 連携（Connect to Git）では作らない（ビルドは GitHub Actions で行う）。
 
